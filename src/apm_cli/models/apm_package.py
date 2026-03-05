@@ -9,6 +9,14 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional, List, Dict, Any, Union
 
+# Module-level parse cache: resolved path -> APMPackage (#171)
+_apm_yml_cache: Dict[Path, "APMPackage"] = {}
+
+
+def clear_apm_yml_cache() -> None:
+    """Clear the from_apm_yml parse cache. Call in tests for isolation."""
+    _apm_yml_cache.clear()
+
 
 class GitReferenceType(Enum):
     """Types of Git references supported."""
@@ -719,6 +727,8 @@ class APMPackage:
     def from_apm_yml(cls, apm_yml_path: Path) -> "APMPackage":
         """Load APM package from apm.yml file.
         
+        Results are cached by resolved path for the lifetime of the process.
+        
         Args:
             apm_yml_path: Path to the apm.yml file
             
@@ -731,6 +741,11 @@ class APMPackage:
         """
         if not apm_yml_path.exists():
             raise FileNotFoundError(f"apm.yml not found: {apm_yml_path}")
+        
+        resolved = apm_yml_path.resolve()
+        cached = _apm_yml_cache.get(resolved)
+        if cached is not None:
+            return cached
         
         try:
             with open(apm_yml_path, 'r', encoding='utf-8') as f:
@@ -778,7 +793,7 @@ class APMPackage:
             except ValueError as e:
                 raise ValueError(f"Invalid 'type' field in apm.yml: {e}")
         
-        return cls(
+        result = cls(
             name=data['name'],
             version=data['version'],
             description=data.get('description'),
@@ -790,6 +805,8 @@ class APMPackage:
             target=data.get('target'),
             type=pkg_type,
         )
+        _apm_yml_cache[resolved] = result
+        return result
     
     def get_apm_dependencies(self) -> List[DependencyReference]:
         """Get list of APM dependencies."""
