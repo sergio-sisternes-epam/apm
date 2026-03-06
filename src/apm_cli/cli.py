@@ -2662,6 +2662,47 @@ def _apply_mcp_overlay(server_info_cache: dict, dep) -> None:
         )
 
 
+def _check_self_defined_servers_needing_installation(
+    dep_names: list, target_runtimes: list
+) -> list:
+    """Check which self-defined MCP servers actually need installation.
+
+    Self-defined servers have no registry UUID, so we check by name (config key)
+    instead of by ID. A server needs installation if it is missing from at least
+    one target runtime's configuration.
+
+    Args:
+        dep_names: List of self-defined server names to check.
+        target_runtimes: List of target runtimes to check.
+
+    Returns:
+        List of server names that need installation in at least one runtime.
+    """
+    try:
+        from apm_cli.factory import ClientFactory
+        from apm_cli.core.conflict_detector import MCPConflictDetector
+    except ImportError:
+        return list(dep_names)
+
+    servers_needing_installation = []
+    for dep_name in dep_names:
+        needs_install = False
+        for runtime in target_runtimes:
+            try:
+                client = ClientFactory.create_client(runtime)
+                detector = MCPConflictDetector(client)
+                existing = detector.get_existing_server_configs()
+                if dep_name not in existing:
+                    needs_install = True
+                    break
+            except Exception:
+                needs_install = True
+                break
+        if needs_install:
+            servers_needing_installation.append(dep_name)
+    return servers_needing_installation
+
+
 def _install_mcp_dependencies(
     mcp_deps: list, runtime: str = None, exclude: str = None, verbose: bool = False
 ):
@@ -2919,7 +2960,28 @@ def _install_mcp_dependencies(
 
     # --- Self-defined deps (registry: false) ---
     if self_defined_deps:
+        self_defined_names = [dep.name for dep in self_defined_deps]
+        self_defined_to_install = _check_self_defined_servers_needing_installation(
+            self_defined_names, target_runtimes
+        )
+        already_configured_self_defined = [
+            name for name in self_defined_names if name not in self_defined_to_install
+        ]
+
+        # Surface already-configured self-defined servers
+        if already_configured_self_defined:
+            for name in already_configured_self_defined:
+                if console:
+                    console.print(
+                        f"│  [green]✓[/green] {name} [dim](already configured)[/dim]"
+                    )
+                elif verbose:
+                    _rich_info(f"{name} already configured, skipping")
+
         for dep in self_defined_deps:
+            if dep.name not in self_defined_to_install:
+                continue
+
             synthetic_info = _build_self_defined_server_info(dep)
             self_defined_cache = {dep.name: synthetic_info}
             self_defined_env = dep.env or {}
