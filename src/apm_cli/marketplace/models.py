@@ -121,6 +121,9 @@ def _parse_plugin_entry(
     raw_tags = entry.get("tags", [])
     tags = tuple(raw_tags) if isinstance(raw_tags, list) else ()
 
+    # Parse optional versions array
+    # (reserved for future use -- currently ignored)
+
     # Determine source -- Copilot uses "repository", Claude uses "source"
     source: Any = None
 
