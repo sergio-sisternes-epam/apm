@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ref immutability advisory: caches plugin-to-ref pins and warns when a previously pinned plugin's ref changes (#514)
 - Multi-marketplace shadow detection: warns when the same plugin name appears in multiple registered marketplaces (#514)
 
+- Multi-target support: `apm.yml` `target` field now accepts a list (`target: [claude, copilot]`) and CLI `--target` accepts comma-separated values (`-t claude,copilot`). Only specified targets are compiled, installed, and packed -- no redundant output for unused tools. Single-string syntax is fully backward compatible. (#628)
+
 ### Fixed
 
 - `apm install` no longer silently drops skills, agents, and commands when a Claude Code plugin also ships `hooks/*.json`. The package-type detection cascade now classifies plugin-shaped packages as `MARKETPLACE_PLUGIN` (which already maps hooks via the plugin synthesizer) before falling back to the hook-only classification, and emits a default-visibility `[!]` warning when a hook-only classification disagrees with the package's directory contents (#780)
