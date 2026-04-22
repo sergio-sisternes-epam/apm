@@ -127,6 +127,43 @@ pip install -e .[dev]
 pytest tests/unit tests/test_console.py -x
 ```
 
+## Recompiling agent outputs
+
+APM uses APM to manage its own agent primitives. The `.apm/` tree at the repo
+root is the **source of truth** for all authored instructions, agents, and
+skills. The following files are **generated** by `apm compile` and MUST NOT be
+hand-edited:
+
+- `AGENTS.md` (root) and the distributed `AGENTS.md` files under subdirectories
+- `CLAUDE.md` (root) and the distributed `CLAUDE.md` files under subdirectories
+- `.github/copilot-instructions.md`
+- Files under `.github/instructions/`, `.github/agents/`, `.github/skills/`
+
+Any edits to these paths will be overwritten on the next compile.
+
+**Workflow when you change anything under `.apm/`:**
+
+```bash
+# 1. Edit the source primitive under .apm/
+$EDITOR .apm/instructions/<name>.instructions.md
+
+# 2. Regenerate all outputs
+apm compile
+
+# 3. Commit the source change AND the regenerated outputs in the same PR
+git add .apm/ AGENTS.md CLAUDE.md .github/
+git commit -m "..."
+```
+
+If you only touched `.apm/` and forgot step 2, CI will catch it: the Tier 1
+`compile-check` job runs `apm compile --check`, which exits non-zero when any
+generated output has drifted from its source. The failure message tells you
+exactly which file is stale and directs you to run `apm compile` locally.
+
+Generated files are marked `linguist-generated=true` in `.gitattributes`, so
+GitHub collapses them by default in PR diffs -- reviewers focus on the `.apm/`
+source change, not the downstream regeneration noise.
+
 ## Coding Style
 
 This project follows:

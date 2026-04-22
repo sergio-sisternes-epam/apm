@@ -432,7 +432,25 @@ The `compilation` key is OPTIONAL. It controls `apm compile` behaviour. All fiel
 | `exclude` | `list<string>` or `string` | `[]` | Glob patterns | Directories to skip during compilation (e.g. `apm_modules/**`). |
 | `placement` | `object` | — | | Placement tuning. See §6.1. |
 
-### 6.1. `compilation.placement`
+### 6.1. `compilation.exclude`
+
+Glob patterns listing workspace-relative directories to skip during primitive discovery. Patterns are matched against paths walked under `.apm/**` (authored primitives) and the legacy `.github/{instructions,agents,skills,chatmodes}/**` discovery roots. Default exclusions (`node_modules`, `__pycache__`, `.git`, `dist`, `build`, `apm_modules`, and dotfiles) are always applied on top of any user-supplied list.
+
+Accepts a list of strings or a single string. Pattern syntax: `*` matches one path segment, `**` matches any number of segments.
+
+```yaml
+compilation:
+  exclude:
+    - "tests/**"              # test fixtures that include sample primitives
+    - "templates/**"          # scaffolding templates shipped with the package
+    - "packages/**"           # in-repo sample packages
+    - "build/**"              # build artefacts
+    - "docs/node_modules/**"  # docs site dependencies
+```
+
+Use this to keep a large monorepo from walking directories that ship sample primitives (e.g. test fixtures, templates) that must not be compiled into the repo's own outputs.
+
+### 6.2. `compilation.placement`
 
 | Field | Type | Default | Description |
 |---|---|---|---|

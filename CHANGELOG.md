@@ -10,11 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `apm compile --check` flag for read-only drift verification. Compiles in memory, compares against files on disk without writing, and exits `0` (match), `1` (drift), or `2` (unrecoverable error). Drift report is written to stderr; stdout is reserved for a future `--json` report. Remediation hints direct content drift to `apm compile` and stale files to `apm compile --clean`. (#792)
+- `.github/copilot-instructions.md` as a `apm compile` output target, emitted from root-scoped instructions (those with an empty `applyTo`). Copilot reads this file natively without following distributed AGENTS.md hops. (#792)
+- Root-scoped instructions: `.instructions.md` files with an empty `applyTo` frontmatter field now compile into the single Copilot-native `.github/copilot-instructions.md` file alongside the existing `AGENTS.md` / `CLAUDE.md` outputs. (#792)
+- `compilation.exclude` manifest key documented in the manifest schema reference, including glob semantics (matched against `.apm/**` and legacy `.github/**` discovery roots) and a worked example. (#792)
 - `apm-primitives-architect` agent: reusable persona for designing and critiquing `.apm/` skill bundles. (#882)
 - CI: add `APM Self-Check` to `ci.yml` for `apm audit --ci`, regeneration-drift validation, and `merge-gate.yml` `EXPECTED_CHECKS` coverage. (#885)
 
 ### Changed
 
+- APM now fully dogfoods itself end to end: all agent-tool outputs (`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, and the distributed `.github/{instructions,agents,skills}/` trees) are generated from `.apm/` by `apm compile`. The repo commits the outputs GitHub-hosted consumers read directly (`AGENTS.md` and `.github/**`); `CLAUDE.md` is gitignored and regenerated locally by each contributor. CI gates drift via `apm compile -t copilot --check` on every push. See `CONTRIBUTING.md` "Recompiling agent outputs" for the contributor workflow. (#695, #792)
 - Hardened `apm-review-panel` skill: one-comment output contract, pre-arbitration completeness gate, Hybrid E Auth Expert routing, verdict template extracted to `assets/`, and `python-architect` mandatory three-artifact PR review contract (classDiagram + flowchart + Design patterns). (#882)
 - CI: smoke tests in `build-release.yml`'s `build-and-test` job (Linux x86_64, Linux arm64, Windows) are now gated to promotion boundaries (tag/schedule/dispatch) instead of running on every push to main. Push-time smoke duplicated the merge-time smoke gate in `ci-integration.yml` and burned ~15 redundant codex-binary downloads/day. Tag-cut releases still run smoke as a pre-ship gate; nightly catches upstream codex URL drift; merge-time still gates merges into main. (#878)
 - CI docs: clarify that branch-protection ruleset must store the check-run name (`gate`), not the workflow display string (`Merge Gate / gate`); document the merge-gate aggregator in `cicd.instructions.md` and mark the legacy stub workflow as deprecated.
@@ -22,6 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - CI: deleted `ci-integration-pr-stub.yml`. The four stubs were a holdover from the pre-merge-gate model where branch protection required each Tier 2 check name directly. After #867, branch protection requires only `gate`, so the stubs are dead weight. Reduced `EXPECTED_CHECKS` in `merge-gate.yml` to just `Build & Test (Linux)`.
+
+### Fixed
+
+- `link_resolver._resolve_path` now enforces `base_dir` containment (fail-closed): resolved paths that escape the configured base directory are rejected instead of silently returning an out-of-tree path, closing a path-traversal hole in markdown link resolution during `apm compile`. (#792)
+- `apm compile` timing output is routed through the logger with a deterministic sort on `base_dir`, replacing direct `print()` calls that bypassed the `--verbose` / `--quiet` filters and produced non-deterministic output ordering across runs. (#792)
 
 ## [0.9.2] - 2026-04-23
 
