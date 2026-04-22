@@ -45,6 +45,13 @@ jobs:
     - name: Install dependencies
       run: uv sync --extra dev --extra build
 
+    - name: Verify agent outputs are up to date
+      # Dogfooding: APM compiles AGENTS.md, CLAUDE.md, and
+      # .github/copilot-instructions.md from .apm/ primitives. This gate
+      # fails if committed outputs drift from what `apm compile` would
+      # regenerate. Run `apm compile` locally and commit the result.
+      run: uv run apm compile --check
+
     - name: Check YAML encoding safety
       run: |
         # Ensure YAML file I/O goes through yaml_io helpers.
@@ -97,11 +104,20 @@ jobs:
         retention-days: 30
         if-no-files-found: error
 
-  # Dogfood the two CI gates we ship and document to users:
-  #   - Gate A (consumer-side): `apm audit --ci` -- lockfile / install fidelity.
-  #   - Gate B (producer-side): regeneration drift -- did someone hand-edit
-  #     a regenerated file under .github/ without updating canonical .apm/?
-  # See microsoft/apm#883 for context. Tier 1 (no secrets needed).
+  # Dogfood the consumer-side CI gate we ship and document to users:
+  #   - `apm audit --ci` -- lockfile / install fidelity.
+  #
+  # The producer-side regeneration-drift gate is handled in build-and-test
+  # via `apm compile -t copilot --check` (see the "Verify agent outputs are
+  # up to date" step above). That gate matches this repo's compile-based
+  # dogfood model (AGENTS.md + .github/copilot-instructions.md + skills/),
+  # which inlines agents/instructions instead of distributing them to
+  # .github/{instructions,agents}/. Running `apm install` here would fight
+  # that model -- it regenerates the distributed tree and would always
+  # produce "drift" against our committed compile outputs.
+  #
+  # See microsoft/apm#792 and microsoft/apm#883 for context. Tier 1 (no
+  # secrets needed).
   apm-self-check:
     name: APM Self-Check
     runs-on: ubuntu-24.04
@@ -110,31 +126,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Installs the APM CLI (latest stable) and runs `apm install` against
-      # this repo's apm.yml. Auto-detects target from the existing .github/
-      # directory and re-integrates local .apm/ content, regenerating
-      # .github/instructions/, .github/agents/, .github/skills/, etc.
-      # Adds `apm` to PATH for subsequent steps.
-      - uses: microsoft/apm-action@v1
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
 
-      # Gate A: lockfile / install fidelity (consumer-side).
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      # Lockfile / install fidelity (consumer-side).
       # Verifies every file in lockfile.deployed_files exists, ref consistency
       # between apm.yml and apm.lock.yaml, no orphan packages, and
       # content-integrity (hidden Unicode) on deployed package content.
       # Does NOT verify deployed-file content vs lockfile (see #684).
       - name: apm audit --ci
-        run: apm audit --ci
-
-      # Gate B: regeneration drift (producer-side).
-      # The action's `apm install` step re-integrated local .apm/ into
-      # .github/ via target auto-detection. If anything in the governed
-      # integration directories changed, someone edited the regenerated
-      # output without updating the canonical .apm/ source.
-      - name: Check APM integration drift
-        run: |
-          if [ -n "$(git status --porcelain -- .github/ .claude/ .cursor/ .opencode/)" ]; then
-            echo "::error::APM integration files are out of date."
-            echo "Run 'apm install' locally (with .github/ present) and commit the result."
-            git --no-pager diff -- .github/ .claude/ .cursor/ .opencode/
-            exit 1
-          fi
+        run: uv run apm audit --ci
