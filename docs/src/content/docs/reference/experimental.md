@@ -100,7 +100,7 @@ apm experimental reset [NAME] [OPTIONS]
 
 ```bash
 $ apm experimental reset
-This will reset 1 experimental feature to their defaults:
+This will reset 1 experimental feature to its default:
   verbose-version (currently enabled -> disabled)
 Proceed? [y/N]: y
 [+] Reset all experimental features to defaults

@@ -155,11 +155,12 @@ Experimental flags MUST NOT gate security-critical behaviour (content scanning, 
 When adding a new experimental flag:
 
 1. Register it in `src/apm_cli/core/experimental.py` in the `FLAGS` dict with a frozen `ExperimentalFlag(name=..., description=..., default=False, hint=...)`.
-2. Gate the code path with a function-scope import:
+2. Gate the code path with a function-scope import (avoids import cycles):
    ```python
-   from apm_cli.core.experimental import is_enabled
-   if is_enabled("my_flag"):
-       ...
+   def my_function():
+       from apm_cli.core.experimental import is_enabled
+       if is_enabled("my_flag"):
+           ...
    ```
 3. Add tests that cover both the enabled and disabled code paths.
 4. Update the experimental command reference page at `docs/src/content/docs/reference/experimental.md`.

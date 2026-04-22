@@ -196,11 +196,11 @@ def enable_flag(ctx, name: str):
     from ..core.experimental import is_enabled
 
     if is_enabled(normalised):
-        logger.progress(f"{_display_name(normalised)} is already enabled.")
+        logger.warning(f"{_display_name(normalised)} is already enabled.")
         return
 
     flag = _enable_flag(normalised)
-    logger.success(f"Enabled experimental feature: {_display_name(normalised)}")
+    logger.success(f"Enabled experimental feature: {_display_name(normalised)}", symbol="check")
     if flag.hint:
         logger.progress(flag.hint)
 
@@ -225,11 +225,11 @@ def disable_flag(ctx, name: str):
     from ..core.experimental import is_enabled
 
     if not is_enabled(normalised):
-        logger.progress(f"{_display_name(normalised)} is already disabled.")
+        logger.warning(f"{_display_name(normalised)} is already disabled.")
         return
 
     _disable_flag(normalised)
-    logger.success(f"Disabled experimental feature: {_display_name(normalised)}")
+    logger.success(f"Disabled experimental feature: {_display_name(normalised)}", symbol="check")
 
 
 @experimental.command("reset", help="Reset experimental features to defaults")
@@ -256,7 +256,8 @@ def reset_flags(ctx, name: str | None, yes: bool):
         default_label = "enabled" if FLAGS[normalised].default else "disabled"
         if reset_result:
             logger.success(
-                f"Reset {_display_name(normalised)} to default ({default_label})"
+                f"Reset {_display_name(normalised)} to default ({default_label})",
+                symbol="check",
             )
         else:
             logger.progress(
@@ -289,9 +290,9 @@ def reset_flags(ctx, name: str | None, yes: bool):
         noun = "feature" if total == 1 else "features"
         pronoun = "its" if total == 1 else "their"
         default_word = "default" if total == 1 else "defaults"
-        click.echo(f"This will reset {total} experimental {noun} to {pronoun} {default_word}:")
+        logger.progress(f"This will reset {total} experimental {noun} to {pronoun} {default_word}:")
         for line in lines:
-            click.echo(line)
+            logger.progress(line)
 
         try:
             from rich.prompt import Confirm
@@ -305,4 +306,4 @@ def reset_flags(ctx, name: str | None, yes: bool):
             return
 
     _reset_flags(None)
-    logger.success("Reset all experimental features to defaults")
+    logger.success("Reset all experimental features to defaults", symbol="check")

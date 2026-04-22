@@ -11,6 +11,7 @@ Covers three scenarios:
 from __future__ import annotations
 
 import re
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -64,7 +65,7 @@ def _reset_helpers_console(monkeypatch) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _invoke_version(runner: CliRunner) -> any:
+def _invoke_version(runner: CliRunner) -> Any:
     """Invoke `apm --version` with update-check and experimental imports isolated."""
     from apm_cli.cli import cli
 

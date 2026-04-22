@@ -150,28 +150,29 @@ class TestEnableCommand:
     def test_enable_exits_0_emits_success_and_hint(
         self, runner: CliRunner
     ) -> None:
-        """Successful enable exits 0, emits [*] success line and hint."""
+        """Successful enable exits 0, emits [+] success line and hint."""
         from apm_cli.commands.experimental import experimental
 
         result = runner.invoke(experimental, ["enable", "verbose-version"])
         assert result.exit_code == 0
-        assert "Enabled experimental feature: verbose-version" in result.output
+        assert "[+] Enabled experimental feature: verbose-version" in result.output
         # hint line must follow success
         assert "apm --version" in result.output
 
-    def test_enable_already_enabled_emits_info_not_success(
+    def test_enable_already_enabled_emits_warning_not_success(
         self, runner: CliRunner
     ) -> None:
-        """Enabling an already-enabled flag emits info, not a false success."""
+        """Enabling an already-enabled flag emits warning [!], not a false success."""
         from apm_cli.commands.experimental import experimental
 
         # First enable succeeds
         runner.invoke(experimental, ["enable", "verbose-version"])
-        # Second enable should be idempotent info
+        # Second enable should be idempotent warning
         result = runner.invoke(experimental, ["enable", "verbose-version"])
         assert result.exit_code == 0
+        assert "[!]" in result.output
         assert "already enabled" in result.output
-        assert "[*] Enabled" not in result.output
+        assert "[+] Enabled" not in result.output
 
     def test_enable_accepts_underscore_input(self, runner: CliRunner) -> None:
         """verbose_version (underscore) is normalised and accepted."""
@@ -216,25 +217,26 @@ class TestDisableCommand:
     def test_disable_after_enable_exits_0_emits_success(
         self, runner: CliRunner
     ) -> None:
-        """disable exits 0 and emits the disabled confirmation."""
+        """disable exits 0 and emits the [+] disabled confirmation."""
         from apm_cli.commands.experimental import experimental
 
         runner.invoke(experimental, ["enable", "verbose-version"])
         result = runner.invoke(experimental, ["disable", "verbose-version"])
         assert result.exit_code == 0
-        assert "Disabled experimental feature: verbose-version" in result.output
+        assert "[+] Disabled experimental feature: verbose-version" in result.output
 
-    def test_disable_already_disabled_emits_info_not_success(
+    def test_disable_already_disabled_emits_warning_not_success(
         self, runner: CliRunner
     ) -> None:
-        """Disabling an already-disabled flag emits info, not a false success."""
+        """Disabling an already-disabled flag emits warning [!], not a false success."""
         from apm_cli.commands.experimental import experimental
 
-        # Flag is disabled by default -- second disable should be idempotent info
+        # Flag is disabled by default -- second disable should be idempotent warning
         result = runner.invoke(experimental, ["disable", "verbose-version"])
         assert result.exit_code == 0
+        assert "[!]" in result.output
         assert "already disabled" in result.output
-        assert "[*] Disabled" not in result.output
+        assert "[+] Disabled" not in result.output
 
 
 # ---------------------------------------------------------------------------
@@ -254,7 +256,7 @@ class TestResetCommand:
         runner.invoke(experimental, ["enable", "verbose-version"])
         result = runner.invoke(experimental, ["reset", "verbose-version"])
         assert result.exit_code == 0
-        assert "Reset verbose-version to default" in result.output
+        assert "[+] Reset verbose-version to default" in result.output
 
     def test_reset_single_flag_already_at_default_prints_noop(
         self, runner: CliRunner
@@ -310,7 +312,7 @@ class TestResetCommand:
         runner.invoke(experimental, ["enable", "verbose-version"])
         result = runner.invoke(experimental, ["reset", "--yes"])
         assert result.exit_code == 0
-        assert "Reset all experimental features to defaults" in result.output
+        assert "[+] Reset all experimental features to defaults" in result.output
 
     def test_reset_redundant_override_shows_removing_wording(
         self, runner: CliRunner
