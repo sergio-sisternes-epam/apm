@@ -14,13 +14,22 @@ from ..version import get_version
 from .claude_formatter import ClaudeFormatter
 from .template_builder import (
     build_conditional_sections,
+    build_root_sections,
     generate_agents_md_template,
     TemplateData,
     find_chatmode_by_name
 )
 from .link_resolver import resolve_markdown_links, validate_link_targets
 from ..utils.paths import portable_relpath
-from ..core.target_detection import should_compile_agents_md, should_compile_claude_md
+from ..core.target_detection import (
+    should_compile_agents_md,
+    should_compile_claude_md,
+    should_compile_copilot_instructions,
+)
+
+
+# Output path for Copilot's root-scoped instructions file (GitHub convention).
+COPILOT_INSTRUCTIONS_PATH = Path(".github") / "copilot-instructions.md"
 
 
 # User-facing target aliases that map to the canonical "vscode" target.
@@ -235,6 +244,11 @@ class AgentsCompiler:
             if should_compile_agents_md(routing_target):
                 results.append(self._compile_agents_md(config, primitives))
 
+            if should_compile_copilot_instructions(routing_target):
+                copilot_result = self._compile_copilot_instructions(config, primitives)
+                if copilot_result is not None:
+                    results.append(copilot_result)
+
             if should_compile_claude_md(routing_target):
                 results.append(self._compile_claude_md(config, primitives))
 
@@ -438,6 +452,58 @@ class AgentsCompiler:
             stats=stats
         )
     
+    def _compile_copilot_instructions(
+        self,
+        config: CompilationConfig,
+        primitives: PrimitiveCollection,
+    ) -> Optional[CompilationResult]:
+        """Compile .github/copilot-instructions.md from root-scoped instructions.
+
+        Aggregates instructions whose ``apply_to`` is empty into a single root
+        file at .github/copilot-instructions.md.  Returns ``None`` when no
+        root-scoped instructions exist, so no empty file is written and the
+        caller can skip adding it to the merged result list.
+        """
+        root_sections = build_root_sections(primitives.instructions, self.base_dir)
+        if not root_sections:
+            return None
+
+        from .constants import GENERATED_HEADER
+        from ..version import get_version as _get_version
+
+        lines = [
+            GENERATED_HEADER,
+            f"<!-- APM Version: {_get_version()} -->",
+            "",
+            "# Copilot Instructions",
+            "",
+            root_sections,
+        ]
+        content = "\n".join(lines)
+
+        output_path = str(self.base_dir / COPILOT_INSTRUCTIONS_PATH)
+        if not config.dry_run:
+            # Ensure .github/ directory exists
+            (self.base_dir / COPILOT_INSTRUCTIONS_PATH).parent.mkdir(
+                parents=True, exist_ok=True
+            )
+            self._write_output_file(output_path, content)
+            self._log(
+                "progress",
+                f"Compiled .github/copilot-instructions.md",
+            )
+
+        return CompilationResult(
+            success=True,
+            output_path=output_path,
+            content=content,
+            warnings=self.warnings.copy(),
+            errors=self.errors.copy(),
+            stats={
+                "copilot_instructions_written": 0 if config.dry_run else 1,
+            },
+        )
+
     def _compile_claude_md(self, config: CompilationConfig, primitives: PrimitiveCollection) -> CompilationResult:
         """Compile CLAUDE.md files (Claude Code target).
         

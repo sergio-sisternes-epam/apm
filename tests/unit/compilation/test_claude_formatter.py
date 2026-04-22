@@ -13,9 +13,8 @@ from apm_cli.compilation.claude_formatter import (
     CommandGenerationResult,
     format_claude_md,
     generate_claude_commands,
-    CLAUDE_HEADER,
 )
-from apm_cli.compilation.constants import BUILD_ID_PLACEHOLDER
+from apm_cli.compilation.constants import BUILD_ID_PLACEHOLDER, GENERATED_HEADER
 from apm_cli.primitives.models import Instruction, Chatmode, PrimitiveCollection
 from apm_cli.version import get_version
 
@@ -94,7 +93,7 @@ class TestFormatDistributed:
         
         content = result.content_map[temp_project / "CLAUDE.md"]
         assert "# CLAUDE.md" in content
-        assert CLAUDE_HEADER in content
+        assert GENERATED_HEADER in content
         assert BUILD_ID_PLACEHOLDER in content
         assert f"<!-- APM Version: {get_version()} -->" in content
 

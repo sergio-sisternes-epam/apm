@@ -8,6 +8,7 @@ from apm_cli.core.target_detection import (
     should_integrate_opencode,
     should_compile_agents_md,
     should_compile_claude_md,
+    should_compile_copilot_instructions,
     get_target_description,
     TargetParamType,
     VALID_TARGET_VALUES,
@@ -283,7 +284,8 @@ class TestGetTargetDescription:
     def test_minimal_description(self):
         """Description for minimal target."""
         desc = get_target_description("minimal")
-        assert "AGENTS.md only" in desc
+        assert "AGENTS.md" in desc
+        assert "copilot-instructions.md" in desc
 
     def test_opencode_description(self):
         """Description for opencode target."""
@@ -608,3 +610,22 @@ class TestTargetParamType:
         """Only commas (no actual values) is rejected."""
         with pytest.raises(click.exceptions.BadParameter, match="must not be empty"):
             self.tp.convert(",,,", None, None)
+
+
+# ---------------------------------------------------------------------------
+# should_compile_copilot_instructions
+# ---------------------------------------------------------------------------
+
+class TestShouldCompileCopilotInstructions:
+    """Gate tests for .github/copilot-instructions.md emission."""
+
+    @pytest.mark.parametrize(
+        "target",
+        ["vscode", "copilot", "agents", "opencode", "codex", "all", "minimal"],
+    )
+    def test_returns_true_for_applicable_targets(self, target: str) -> None:
+        assert should_compile_copilot_instructions(target) is True
+
+    @pytest.mark.parametrize("target", ["claude", "cursor"])
+    def test_returns_false_for_inapplicable_targets(self, target: str) -> None:
+        assert should_compile_copilot_instructions(target) is False

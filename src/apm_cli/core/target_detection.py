@@ -201,6 +201,18 @@ def should_compile_claude_md(target: TargetType) -> bool:
     return target in ("claude", "all")
 
 
+def should_compile_copilot_instructions(target: UserTargetType) -> bool:
+    """Check if .github/copilot-instructions.md should be compiled.
+
+    Copilot's root-scoped instructions file applies to the same targets as
+    AGENTS.md (vscode-family), but is a separate concern so it gets its own
+    gate. This allows the predicate to diverge if needed (for example, if
+    ``minimal`` later excludes copilot-instructions).
+    """
+    normalised = "vscode" if target in ("copilot", "agents") else target
+    return normalised in ("vscode", "opencode", "codex", "all", "minimal")
+
+
 def get_target_description(target: UserTargetType) -> str:
     """Get a human-readable description of what will be generated for a target.
     
@@ -215,13 +227,13 @@ def get_target_description(target: UserTargetType) -> str:
     # Normalize aliases to internal value for lookup
     normalized = "vscode" if target in ("copilot", "agents") else target
     descriptions = {
-        "vscode": "AGENTS.md + .github/prompts/ + .github/agents/",
+        "vscode": "AGENTS.md + .github/copilot-instructions.md + .github/prompts/ + .github/agents/",
         "claude": "CLAUDE.md + .claude/commands/ + .claude/agents/ + .claude/skills/",
         "cursor": ".cursor/agents/ + .cursor/skills/ + .cursor/rules/",
-        "opencode": "AGENTS.md + .opencode/agents/ + .opencode/commands/ + .opencode/skills/",
-        "codex": "AGENTS.md + .agents/skills/ + .codex/agents/ + .codex/hooks.json",
-        "all": "AGENTS.md + CLAUDE.md + .github/ + .claude/ + .cursor/ + .opencode/ + .codex/ + .agents/",
-        "minimal": "AGENTS.md only (create .github/ or .claude/ for full integration)",
+        "opencode": "AGENTS.md + .github/copilot-instructions.md + .opencode/agents/ + .opencode/commands/ + .opencode/skills/",
+        "codex": "AGENTS.md + .github/copilot-instructions.md + .agents/skills/ + .codex/agents/ + .codex/hooks.json",
+        "all": "AGENTS.md + CLAUDE.md + .github/copilot-instructions.md + .github/ + .claude/ + .cursor/ + .opencode/ + .codex/ + .agents/",
+        "minimal": "AGENTS.md + .github/copilot-instructions.md (create .github/ or .claude/ for full integration)",
     }
     return descriptions.get(normalized, "unknown target")
 
