@@ -27,6 +27,11 @@ timeout-minutes: 40
 
 permissions: read-all
 
+checkout:
+  fetch-depth: 0
+  fetch:
+  - "*"
+
 network:
   allowed:
   - defaults
