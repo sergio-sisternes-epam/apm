@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="Electron" modified="2026-05-13T16:42:00.000Z" agent="chaos-monkey-gen" etag="chaos-monkey" version="24.0.0" type="device">
+  <diagram id="page-1" name="Discovery loop">
+    <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1980" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="title" value="&lt;b&gt;Chaos-monkey discovery loop (daily)&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="4" width="1620" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_cron" value="Cron 06h UTC" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_ghaw" value="gh-aw runtime" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="240" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_mem" value="Memory branch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="420" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_agent" value="chaos-monkey agent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="600" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_apm" value="apm CLI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="780" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_fixt" value="tests/chaos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="960" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_safe" value="SafeOutputs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_maint" value="Maintainer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_main" value="main branch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="l_cron" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="84" as="sourcePoint"/>
+            <mxPoint x="135" y="952" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_ghaw" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="84" as="sourcePoint"/>
+            <mxPoint x="315" y="952" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_mem" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="495" y="84" as="sourcePoint"/>
+            <mxPoint x="495" y="952" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_agent" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="84" as="sourcePoint"/>
+            <mxPoint x="675" y="952" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_apm" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="855" y="84" as="sourcePoint"/>
+            <mxPoint x="855" y="952" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_fixt" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1035" y="84" as="sourcePoint"/>
+            <mxPoint x="1035" y="952" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_safe" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1215" y="84" as="sourcePoint"/>
+            <mxPoint x="1215" y="952" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_maint" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1395" y="84" as="sourcePoint"/>
+            <mxPoint x="1395" y="952" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_main" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1575" y="84" as="sourcePoint"/>
+            <mxPoint x="1575" y="952" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_1" value="trigger schedule" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="120" as="sourcePoint"/>
+            <mxPoint x="315" y="120" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n_2" value="Also slash command or workflow_dispatch" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=10;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="255" y="152" width="120" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_3" value="spawn container, load persona and skill" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="198" as="sourcePoint"/>
+            <mxPoint x="675" y="198" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_4" value="read findings.md" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="234" as="sourcePoint"/>
+            <mxPoint x="495" y="234" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_5" value="hardened vector signatures" style="endArrow=open;html=1;dashed=1;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="495" y="270" as="sourcePoint"/>
+            <mxPoint x="675" y="270" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_6" value="pick lowest-hardened surface" style="html=1;endArrow=block;startSize=8;endSize=8;exitX=0.5;exitY=0;entryX=0.5;entryY=0;rounded=0;curved=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="670" y="306" as="sourcePoint"/>
+            <mxPoint x="670" y="332" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="725" y="302"/>
+              <mxPoint x="725" y="328"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n_7" value="Lazy-load only chosen surface reference" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=10;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="615" y="342" width="480" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_8" value="call apm_project and bogus_pat_env" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="388" as="sourcePoint"/>
+            <mxPoint x="1035" y="388" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_9" value="scratch path + env overrides" style="endArrow=open;html=1;dashed=1;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1035" y="424" as="sourcePoint"/>
+            <mxPoint x="675" y="424" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_10" value="run_apm with args, cwd, env, timeout" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="460" as="sourcePoint"/>
+            <mxPoint x="855" y="460" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_11" value="ChaosResult tuple" style="endArrow=open;html=1;dashed=1;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="855" y="496" as="sourcePoint"/>
+            <mxPoint x="675" y="496" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_12" value="classify graceful / silent / uncontrolled" style="html=1;endArrow=block;startSize=8;endSize=8;exitX=0.5;exitY=0;entryX=0.5;entryY=0;rounded=0;curved=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="670" y="532" as="sourcePoint"/>
+            <mxPoint x="670" y="558" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="725" y="528"/>
+              <mxPoint x="725" y="554"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_13" value="write tests/chaos/test_surface_vector.py" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="572" as="sourcePoint"/>
+            <mxPoint x="1035" y="572" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_14" value="ruff check + format + pytest -m chaos" style="html=1;endArrow=block;startSize=8;endSize=8;exitX=0.5;exitY=0;entryX=0.5;entryY=0;rounded=0;curved=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="670" y="608" as="sourcePoint"/>
+            <mxPoint x="670" y="634" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="725" y="604"/>
+              <mxPoint x="725" y="630"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n_15" value="Validation gate; no SafeOutputs on failure" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=10;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="615" y="644" width="120" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_16" value="append finding to findings.md" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="690" as="sourcePoint"/>
+            <mxPoint x="495" y="690" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_17" value="emit one Issue + one draft PR" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="726" as="sourcePoint"/>
+            <mxPoint x="1215" y="726" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_18" value="GitHub Issue + draft PR" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1215" y="762" as="sourcePoint"/>
+            <mxPoint x="1395" y="762" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_19" value="push memory branch" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="798" as="sourcePoint"/>
+            <mxPoint x="495" y="798" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_20" value="review and merge draft PR" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1395" y="834" as="sourcePoint"/>
+            <mxPoint x="1575" y="834" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n_21" value="Trap file persisted forever on main" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=10;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1515" y="866" width="120" height="36" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="page-2" name="Regression guard">
+    <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="title" value="&lt;b&gt;Chaos-regression CI (per-PR + nightly)&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="4" width="1440" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_dev" value="Contributor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_pr" value="Pull Request" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="240" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_filt" value="Path filter" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="420" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_ci" value="chaos-regression CI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="600" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_chaos" value="tests/chaos suite" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="780" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_cron2" value="Nightly cron 04h UTC" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="960" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_main" value="main branch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="p_maint" value="Maintainer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#333333;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="40" width="150" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="l_dev" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="84" as="sourcePoint"/>
+            <mxPoint x="135" y="736" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_pr" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="84" as="sourcePoint"/>
+            <mxPoint x="315" y="736" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_filt" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="495" y="84" as="sourcePoint"/>
+            <mxPoint x="495" y="736" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_ci" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="84" as="sourcePoint"/>
+            <mxPoint x="675" y="736" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_chaos" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="855" y="84" as="sourcePoint"/>
+            <mxPoint x="855" y="736" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_cron2" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1035" y="84" as="sourcePoint"/>
+            <mxPoint x="1035" y="736" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_main" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1215" y="84" as="sourcePoint"/>
+            <mxPoint x="1215" y="736" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_maint" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1395" y="84" as="sourcePoint"/>
+            <mxPoint x="1395" y="736" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_1" value="open or push commit" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="120" as="sourcePoint"/>
+            <mxPoint x="315" y="120" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_2" value="announce changed paths" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="156" as="sourcePoint"/>
+            <mxPoint x="495" y="156" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_3" value="trigger workflow (if src/ matched)" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="495" y="192" as="sourcePoint"/>
+            <mxPoint x="675" y="192" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n_4" value="Filter on src/apm_cli/**, tests/chaos/**, pyproject.toml, apm.yml/lock" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=10;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="435" y="224" width="300" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_5" value="pytest -m chaos -n auto" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="270" as="sourcePoint"/>
+            <mxPoint x="855" y="270" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_6" value="pass or fail per trap" style="endArrow=open;html=1;dashed=1;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="855" y="306" as="sourcePoint"/>
+            <mxPoint x="675" y="306" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_7" value="required check passes (green)" style="endArrow=open;html=1;dashed=1;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="342" as="sourcePoint"/>
+            <mxPoint x="315" y="342" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_8" value="required check fails (red)" style="endArrow=open;html=1;dashed=1;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="378" as="sourcePoint"/>
+            <mxPoint x="315" y="378" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_9" value="investigate, fix regression or flip xfail" style="endArrow=open;html=1;dashed=1;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="414" as="sourcePoint"/>
+            <mxPoint x="135" y="414" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_10" value="scheduled trigger on main 04h UTC" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1035" y="450" as="sourcePoint"/>
+            <mxPoint x="675" y="450" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n_11" value="Scheduled BEFORE chaos-monkey 06h UTC to disambiguate signals" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=10;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="615" y="482" width="480" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_12" value="pytest -m chaos -n auto" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="528" as="sourcePoint"/>
+            <mxPoint x="855" y="528" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_13" value="pass or fail" style="endArrow=open;html=1;dashed=1;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="855" y="564" as="sourcePoint"/>
+            <mxPoint x="675" y="564" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_14" value="notify on regression (failure alert)" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="675" y="600" as="sourcePoint"/>
+            <mxPoint x="1395" y="600" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m_15" value="bisect 24h window; revert or fix PR" style="endArrow=block;html=1;dashed=0;strokeColor=#333333;fontSize=11;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1395" y="636" as="sourcePoint"/>
+            <mxPoint x="1215" y="636" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="page-3" name="Composition">
+    <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="title" value="&lt;b&gt;Composition: how the discovery and regression loops connect&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="20" width="1240" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_disc" value="Discovery loop (daily, gh-aw runtime)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=13;fontStyle=1;verticalAlign=top;align=center;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="100" width="540" height="700" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_reg" value="Regression-guard loop (per-PR + nightly CI)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=13;fontStyle=1;verticalAlign=top;align=center;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="100" width="540" height="700" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_agent" value="chaos-monkey agent
+(persona + skill)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D79B00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="160" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_run" value="run_apm
+(subprocess + sanitised env)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D79B00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="260" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_classify" value="Classify outcome
+graceful / silent / uncontrolled" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D79B00;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="150" y="360" width="200" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_writetrap" value="Write trap file
+tests/chaos/test_*.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D79B00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="470" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_safe" value="SafeOutputs
+(1 Issue + 1 draft PR)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D79B00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="570" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_mem" value="Memory branch
+findings.md
+(dedup signatures)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#FFFFFF;strokeColor=#D79B00;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="400" y="260" width="180" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_main" value="main branch
+tests/chaos/*.py
+(persistent traps)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#F5F5F5;strokeColor=#333333;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="420" width="160" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_prtrigger" value="PR opens
+(path-filtered)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6C8EBF;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="830" y="160" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_cronregress" value="Nightly cron 04h UTC
+on main" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6C8EBF;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="160" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_runci" value="pytest -m chaos -n auto
+(chaos-regression workflow)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6C8EBF;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="960" y="290" width="220" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_verdict" value="Green: merge
+Red: regression caught" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6C8EBF;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="960" y="410" width="220" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_fix" value="Fix PR
+or xfail flip
+or revert" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6C8EBF;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="960" y="530" width="220" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_metric" value="chaos_metric.py
+hardened_findings count
+(autoloop signal)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="550" y="620" width="200" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1" value="invoke" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_agent" target="n_run">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" value="ChaosResult" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_run" target="n_classify">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="evidence" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_classify" target="n_writetrap">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" value="PR intent" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_writetrap" target="n_safe">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e5" value="read" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_agent" target="n_mem">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e6" value="signatures" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_mem" target="n_agent">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7" value="append" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_writetrap" target="n_mem">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" value="human-merged PR" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_safe" target="n_main">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" value="checked out" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_main" target="n_runci">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10" value="trigger" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_prtrigger" target="n_runci">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e11" value="trigger" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_cronregress" target="n_runci">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e12" value="result" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_runci" target="n_verdict">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e13" value="if red" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_verdict" target="n_fix">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e14" value="merged fix" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_fix" target="n_main">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e15" value="count traps" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_main" target="n_metric">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e16" value="convergence signal" style="endArrow=block;html=1;rounded=0;strokeColor=#333333;fontSize=10;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="n_metric" target="n_agent">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend" value="&lt;b&gt;Legend&lt;/b&gt;&lt;br/&gt;Orange = discovery (daily gh-aw)&lt;br/&gt;Blue = regression-guard (CI)&lt;br/&gt;Grey cylinder = persistent state on main&lt;br/&gt;Purple = autoloop metric" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#333333;fontSize=10;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="820" width="380" height="60" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
