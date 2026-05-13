@@ -1,0 +1,57 @@
+{
+  "description": "Content evals for the chaos-vector-catalogue skill. Each scenario runs the same prompt twice -- once with the skill loaded, once without -- to measure the value delta. If with-skill and without-skill outputs are indistinguishable, the skill is not adding value; redesign or delete.",
+  "scenarios": [
+    {
+      "id": "vector-pick-and-reproduction",
+      "prompt": "Pick a chaos vector for apm.yml schema and write a regression-trap test that asserts a graceful error message when the file lists a non-existent target.",
+      "with_skill_expected": [
+        "Loads references/apm_yml_schema.md only (not all six surfaces).",
+        "Uses tests/chaos/_harness.run_apm to invoke the real binary (subprocess), not a Python-level YAML parser.",
+        "Captures actual exit code and stderr, not asserted ones.",
+        "Test file lives under tests/chaos/ and is decorated with @pytest.mark.chaos.",
+        "Test asserts exit code != 0 AND a specific stderr fragment, classified as 'graceful'.",
+        "Test name encodes the vector signature (so memory/chaos-monkey/findings.md can dedupe)."
+      ],
+      "without_skill_likely": [
+        "Writes a unit test that parses YAML at the Python level, bypassing the CLI surface.",
+        "Asserts an exception class instead of a process-level exit code + stderr.",
+        "Places the test under tests/unit/ without the chaos marker.",
+        "No vector signature recorded; future runs re-discover the same finding."
+      ],
+      "pass_criteria": "with_skill output captures real subprocess evidence under tests/chaos/ with the chaos marker; without_skill output does not."
+    },
+    {
+      "id": "deduplication-against-memory",
+      "prompt": "Look at past chaos findings in memory and pick a vector that has NOT been hardened yet for the auth-flows surface.",
+      "with_skill_expected": [
+        "Reads memory/chaos-monkey/findings.md before proposing a vector.",
+        "Returns a vector signature that is NOT present in the memory file.",
+        "Loads references/auth_flows.md only.",
+        "States explicit ruling-out of any candidate already in memory."
+      ],
+      "without_skill_likely": [
+        "Re-proposes a previously hardened vector (no memory awareness).",
+        "Skips memory entirely and improvises from generic auth-failure intuition."
+      ],
+      "pass_criteria": "with_skill names memory/chaos-monkey/findings.md by path AND its proposed signature does not collide with any entry; without_skill does not consult memory."
+    },
+    {
+      "id": "classification-discipline",
+      "prompt": "Reproduce: invoke apm install with a lockfile that is deleted mid-run. Classify the outcome and write the regression-trap test.",
+      "with_skill_expected": [
+        "Calls run_apm (subprocess) and captures real exit code, stderr, stdout, timed_out flag.",
+        "Classifies the outcome as exactly one of: graceful, silent, uncontrolled, using the classification table in SKILL.md.",
+        "Cites the captured evidence (exit code value, stderr fragment, state-mutation observation) as the basis for the classification, not LLM intuition.",
+        "Emits an issue body using the inline template (vector signature + classification + reproduction commands + recommended hardening).",
+        "Does NOT fix the bug; explicitly states the hard-constraint boundary."
+      ],
+      "without_skill_likely": [
+        "Classifies without captured evidence (LLM asserts 'this is uncontrolled' from prose).",
+        "Proposes a code fix in src/apm_cli/ alongside the test (violates the hard-constraint boundary).",
+        "Skips the timed_out check and confuses a hang with a silent failure."
+      ],
+      "pass_criteria": "with_skill cites real subprocess evidence to justify the classification AND does not propose source changes; without_skill either lacks evidence or crosses the boundary."
+    }
+  ],
+  "ship_gate": "On at least 2 of 3 scenarios, with_skill output meets pass_criteria and without_skill output does not. If 0 or 1 scenarios show a delta, redesign or delete the skill."
+}

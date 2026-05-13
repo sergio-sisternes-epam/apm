@@ -129,12 +129,13 @@ warn_return_any = true
 warn_unused_configs = true
 
 [tool.pytest.ini_options]
-addopts = "-m 'not benchmark and not live'"
+addopts = "-m 'not benchmark and not live and not chaos'"
 markers = [
     "integration: marks tests as integration tests that may require network access",
     "live: marks tests that hit real GitHub repos (requires network + optional GITHUB_TOKEN)",
     "slow: marks tests as slow running tests",
     "benchmark: marks performance benchmark tests (deselected by default, run with -m benchmark)",
+    "chaos: marks regression-trap tests authored by the chaos-monkey agent (deselected by default, run with -m chaos)",
     "requires_e2e_mode: requires APM_E2E_TESTS=1",
     "requires_github_token: requires GITHUB_APM_PAT or GITHUB_TOKEN",
     "requires_ado_pat: requires ADO_APM_PAT",

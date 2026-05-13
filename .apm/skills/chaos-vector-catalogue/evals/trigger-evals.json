@@ -1,0 +1,39 @@
+{
+  "description": "Trigger evals for the chaos-vector-catalogue skill dispatch description. 10 should-trigger + 10 should-NOT-trigger. 60/40 train/val split (12 train, 8 val). Validation split is the ship gate: rate >= 0.5 on should-trigger AND < 0.5 on should-not-trigger.",
+  "should_trigger": {
+    "train": [
+      "find edge cases in apm install",
+      "what happens if I pass a bogus apm.yml",
+      "stress test the apm cli",
+      "fuzz apm with malformed input",
+      "explore failure modes in dependency resolution",
+      "discover unexpected inputs that crash apm"
+    ],
+    "val": [
+      "test how apm handles a deleted lockfile mid-run",
+      "break the auth resolver in unusual ways",
+      "what undocumented inputs would trip apm install",
+      "regression-trap a silent failure in marketplace download"
+    ]
+  },
+  "should_not_trigger": {
+    "train": [
+      "review this PR",
+      "add unit tests for module X",
+      "update docs",
+      "raise apm coverage to 95%",
+      "fix the bug in install.py",
+      "explain how AuthResolver works"
+    ],
+    "val": [
+      "regenerate the lockfile",
+      "publish a release",
+      "merge this branch",
+      "summarise recent issues"
+    ]
+  },
+  "notes": [
+    "Should-trigger queries probe failure-mode discovery, fuzzing, undocumented-input exploration, and regression-trap framing -- all distinct from generic coverage or PR review.",
+    "Should-not-trigger queries cover sibling primitives: pr-review-panel (PR review), daily-test-improver (coverage), doc-sync (docs), normal bugfix flow, AuthResolver explanation (read-only research), release management, and triage. Sharpens the boundary called out in plan.md Step 5 (DISPATCH COLLISION with test-coverage-expert / daily-test-improver)."
+  ]
+}

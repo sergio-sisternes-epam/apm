@@ -243,6 +243,24 @@ When adding a new precondition, add an entry to `_MARKER_CHECKS` and
 declare the marker in `pyproject.toml`; that is the only place the
 precondition needs to live.
 
+### Chaos tests (chaos-monkey loop)
+
+The `chaos-monkey` recurrent agent (see
+`.github/workflows/chaos-monkey.md`) exercises the APM CLI in
+undocumented ways on a daily schedule. Each finding lands as a
+regression-trap test under `tests/chaos/` carrying the `@pytest.mark.chaos`
+marker. These tests are OPT-IN: the default pytest invocation excludes
+them via `pyproject.toml` (`addopts = "-m 'not benchmark and not live
+and not chaos'"`). Run them explicitly with:
+
+```bash
+uv run pytest tests/chaos -m chaos -v
+```
+
+To disable the recurrent loop, remove or comment the `schedule:` block
+in `.github/workflows/chaos-monkey.md` and recompile with `gh aw compile
+chaos-monkey`.
+
 ## Coding Style
 
 This project follows:
