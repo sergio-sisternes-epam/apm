@@ -42,6 +42,8 @@ def _raw(
     merged_at: str | None = None,
     labels: list[str] | None = None,
     pull_request: dict | None = None,
+    comments: list | str | None = None,
+    has_scope_record: bool | None = None,
 ) -> dict:
     """Build a REST-shaped item; never a live API payload."""
     item = {
@@ -57,6 +59,10 @@ def _raw(
         item["merged_at"] = merged_at
     if pull_request is not None:
         item["pull_request"] = pull_request
+    if comments is not None:
+        item["comments"] = comments
+    if has_scope_record is not None:
+        item["has_scope_record"] = has_scope_record
     return item
 
 
@@ -158,7 +164,7 @@ def test_missing_linked_issue_is_not_a_skip() -> None:
 
 
 def test_accumulate_stops_when_plan_is_full(tmp_path: Path) -> None:
-    """Oldest-first pages continue past skips until ten selectable items."""
+    """Oldest-first pages continue past skips until the sweep cap is full."""
     records = [
         FETCH["normalize_record"](_raw(n, labels=["status/triaged"]), "issue") for n in range(1, 6)
     ]
@@ -171,7 +177,7 @@ def test_accumulate_stops_when_plan_is_full(tmp_path: Path) -> None:
     )
     plan = FETCH["plan_batch"](batch, CONTRACT)
     assert plan["batch_full"] is True
-    assert [item["number"] for item in plan["selected"]] == [6, 7, *range(20, 28)]
+    assert [item["number"] for item in plan["selected"]] == [6, 7, 20, 21, 22]
 
 
 def test_cli_records_json_skips_gh(tmp_path: Path) -> None:
@@ -290,3 +296,90 @@ def test_trusted_gh_uses_cli_owner(monkeypatch: pytest.MonkeyPatch) -> None:
         lambda: "/trusted/bin/gh",
     )
     assert FETCH["_trusted_gh"]() == "/trusted/bin/gh"
+
+
+def test_sweep_skips_decided_labels_and_scope_records() -> None:
+    """Sweep drops maintainer decisions; explicit requests keep them."""
+    accepted = FETCH["normalize_record"](_raw(1, labels=["status/accepted"]), "issue")
+    declined = FETCH["normalize_record"](_raw(2, labels=["status/declined"]), "issue")
+    scoped = FETCH["normalize_record"](
+        _raw(3, comments=[{"body": "<!-- apm-scope:v1 -->\nDecision: approve"}]),
+        "issue",
+    )
+    flagged = FETCH["normalize_record"](_raw(4, has_scope_record=True), "issue")
+    roster = FETCH["normalize_record"](
+        _raw(5, comments=[{"body": "<!-- apm-scope-roster:start -->"}]),
+        "issue",
+    )
+    fresh = FETCH["normalize_record"](_raw(6, has_scope_record=False), "issue")
+    assert scoped["has_scope_record"] is True
+    assert flagged["has_scope_record"] is True
+    assert roster["has_scope_record"] is False
+    assert FETCH["skip_reason"](accepted, "sweep") == "accepted"
+    assert FETCH["skip_reason"](declined, "sweep") == "declined"
+    assert FETCH["skip_reason"](scoped, "sweep") == "scope-record"
+    assert FETCH["skip_reason"](flagged, "sweep") == "scope-record"
+    assert FETCH["skip_reason"](roster, "sweep") is None
+    assert FETCH["skip_reason"](fresh, "sweep") is None
+    for record in (accepted, declined, scoped, flagged):
+        assert FETCH["skip_reason"](record, "dispatch") is None
+        assert FETCH["skip_reason"](record, "label-event") is None
+
+
+def test_sweep_exclude_labels_cover_reviewed_and_decided() -> None:
+    """Search negatives come from the contract, not a second label list."""
+    names = FETCH["sweep_exclude_labels"](CONTRACT)
+    assert names[:2] == ["triage/recommended", "status/triaged"]
+    assert "status/accepted" in names
+    assert "status/declined" in names
+    assert CONTRACT["processing"]["sweep_cap"] == 5
+    assert CONTRACT["processing"]["scope_record_marker"] == "<!-- apm-scope:v1 -->"
+
+
+def test_list_pages_sweep_query_excludes_decided_labels() -> None:
+    """Decided labels are search negatives, same as completed-advice markers."""
+    seen: list[list[str]] = []
+
+    def _runner(args: list[str]) -> dict:
+        seen.append(args)
+        return {"items": []}
+
+    FETCH["list_pages"](
+        "issue",
+        "microsoft/apm",
+        runner=_runner,
+        exclude_labels=FETCH["sweep_exclude_labels"](CONTRACT),
+    )
+    query = seen[0][2]
+    assert "status%2Faccepted" in query or "status/accepted" in query
+    assert "status%2Fdeclined" in query or "status/declined" in query
+
+
+def test_attach_scope_records_prefetches_before_batch_is_full() -> None:
+    """Comment reads happen before planning and stop once the sweep cap is full."""
+    records = [FETCH["normalize_record"](_raw(1, labels=["status/accepted"]), "issue")]
+    records.extend(
+        FETCH["normalize_record"](_raw(n, login=f"author-{n}", has_scope_record=False), "issue")
+        for n in range(2, 9)
+    )
+    fetched: list[int] = []
+
+    def _runner(args: list[str]) -> list[dict]:
+        number = int(args[-1].split("/issues/")[1].split("/")[0])
+        fetched.append(number)
+        if number == 2:
+            return [{"body": "<!-- apm-scope:v1 -->\nDecision: approve"}]
+        return [{"body": "thanks for the report"}]
+
+    labels = ["triage/recommended", "status/triaged"]
+    FETCH["attach_scope_records_for_sweep"](
+        records,
+        "microsoft/apm",
+        labels,
+        CONTRACT,
+        runner=_runner,
+    )
+    assert 1 not in fetched
+    assert records[1]["has_scope_record"] is True
+    assert fetched == [2, 3, 4, 5, 6, 7]
+    assert 8 not in fetched

@@ -175,6 +175,27 @@ def test_activation_remains_read_only_with_version_check(workflow: str) -> None:
     assert lock["jobs"]["conclusion"]["permissions"]["issues"] == "write"
 
 
+def test_triage_panel_sweep_prompt_excludes_decided_and_caps() -> None:
+    """Sweep prompt excludes decided issues and caps at 5."""
+    source = LOCK_PATH.with_name("triage-panel.md").read_text(encoding="ascii")
+    frontmatter = yaml.safe_load(source.split("---", 2)[1])
+    assert frontmatter["engine"]["id"] == "copilot"
+    assert "model" not in frontmatter["engine"]
+    assert frontmatter["timeout-minutes"] == 30
+    assert (
+        "-label:triage/recommended -label:status/triaged "
+        "-label:status/accepted -label:status/declined"
+    ) in source
+    assert "up to 5 eligible issues" in source
+    assert "cap 5" in source
+    assert "up to 10" not in source
+    assert "cap 10" not in source
+    assert "30-minute workflow timeout" in source
+    assert "token budget" in source
+    assert "has_scope_record" in source
+    assert "apm-scope:v1" in source
+
+
 def test_triage_panel_lock_pins_copilot_cli_version() -> None:
     """Keep the compiled Copilot CLI installation deterministic."""
     lock_text = LOCK_PATH.read_text(encoding="utf-8")

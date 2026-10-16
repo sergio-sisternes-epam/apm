@@ -25,6 +25,9 @@
     "request_triggers": ["triage/requested"],
     "active_write_reviewed": "triage/recommended",
     "removable": ["triage/requested"],
+    "sweep_exclude_labels": ["status/accepted", "status/declined"],
+    "sweep_cap": 5,
+    "scope_record_marker": "<!-- apm-scope:v1 -->",
     "meaning": "Advisory processing and deduplication only, never human acceptance."
   },
   "legacy_read_aliases": {
@@ -63,6 +66,8 @@
     "Keep both reviewed markers in read filters during rollout. Preserve legacy markers until separately approved migration and rollback have been checked. Never remove status/needs-triage when an advisory completes.",
     "Request fresh advice with triage/requested or manual dispatch. status/needs-triage is no longer an event trigger and is never consumed.",
     "Paginate oldest-first past skipped, reviewed and per-author-quota items until the eligible batch is full or candidates are exhausted. Never stop at an all-skipped first page.",
-    "Sweep list queries exclude processing.read_reviewed labels (triage/recommended and status/triaged) at GitHub so already-advised open issues and PRs are not downloaded. Explicit requests still fetch the named item. Do not write status/triaged."
+    "Sweep list queries exclude processing.read_reviewed labels (triage/recommended and status/triaged) at GitHub so already-advised open issues and PRs are not downloaded. Explicit requests still fetch the named item. Do not write status/triaged.",
+    "Sweep list queries also exclude processing.sweep_exclude_labels (status/accepted and status/declined). Sweep selection skips those labels and any item whose comments contain processing.scope_record_marker. Explicit requests still fetch the named item.",
+    "Sweep cap is processing.sweep_cap (5), within 3 to 5. The only workflow run limit is the 30-minute timeout. Do not stop a sweep early for a self-imposed token, turn, or time budget."
   ]
 }

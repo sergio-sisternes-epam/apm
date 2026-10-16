@@ -25,8 +25,8 @@ plan_batch = runpy.run_path(str(Path(__file__).resolve().with_name("triage_state
 ]
 
 PAGE_SIZE = 100
-SWEEP_CAP = 10
 URL_RE = re.compile(r"https?://\S+", re.ASCII)
+SCOPE_RECORD_KEYS = ("has_scope_record", "scope_record")
 IDENTICAL_RUN_RE = re.compile(r"(.)\1{49}")
 HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 FENCE_MARKUP_RE = re.compile(
@@ -45,6 +45,68 @@ PLACEHOLDER_RE = re.compile(
     r"reporting and investigating a bug need no permission.*$",
     re.IGNORECASE | re.MULTILINE,
 )
+
+
+def scope_marker(contract: dict[str, Any] | None = None) -> str:
+    """Return the maintainer scope-record marker from the label contract."""
+    loaded = contract if contract is not None else _load_contract()
+    return str(loaded["processing"]["scope_record_marker"])
+
+
+def comments_have_scope_record(comments: Any, marker: str) -> bool:
+    """True when any comment body contains the maintainer scope-record marker."""
+    if isinstance(comments, str):
+        return marker in comments
+    if not isinstance(comments, list):
+        return False
+    for item in comments:
+        if isinstance(item, str) and marker in item:
+            return True
+        if isinstance(item, dict):
+            body = item.get("body")
+            if isinstance(body, str) and marker in body:
+                return True
+    return False
+
+
+def resolve_scope_record(raw: dict[str, Any], marker: str) -> bool:
+    """True when prefetched comments or an explicit flag show a scope record."""
+    if comments_have_scope_record(raw.get("comments"), marker):
+        return True
+    for key in SCOPE_RECORD_KEYS:
+        value = raw.get(key)
+        if value is True or value == "true":
+            return True
+    return False
+
+
+def sweep_exclude_labels(contract: dict[str, Any]) -> list[str]:
+    """Labels a sweep search must exclude before download."""
+    processing = contract["processing"]
+    names = [str(name) for name in processing["read_reviewed"]]
+    for name in processing["sweep_exclude_labels"]:
+        text = str(name)
+        if text not in names:
+            names.append(text)
+    return names
+
+
+def decided_skip_reason(record: dict[str, Any], contract: dict[str, Any]) -> str | None:
+    """Return a sweep skip token for a maintainer decision, or None."""
+    labels = set(record.get("labels") or [])
+    for name in contract["processing"]["sweep_exclude_labels"]:
+        if str(name) not in labels:
+            continue
+        if name == "status/accepted":
+            return "accepted"
+        if name == "status/declined":
+            return "declined"
+        return "decided"
+    if record.get("has_scope_record") is True:
+        return "scope-record"
+    return None
+
+
 def _alnum_count(text: str) -> int:
     """Count ASCII alphanumeric characters."""
     return sum(char.isalnum() for char in text)
@@ -109,7 +171,9 @@ def skip_reason(record: dict[str, Any], mode: str) -> str | None:
     triaged like any other contribution.
 
     Completed-advice markers stay eligible; `triage_state.plan_batch` owns
-    that sweep skip plus the per-author quota.
+    that sweep skip plus the per-author quota. Sweep also skips maintainer
+    decisions (`status/accepted`, `status/declined`, and scope records).
+    Explicit requests keep those items.
     """
     if record["state"] != "open":
         return "closed" if not record.get("merged") else "merged"
@@ -126,6 +190,8 @@ def skip_reason(record: dict[str, Any], mode: str) -> str | None:
         return "draft"
     if mode == "sweep" and is_spam_shaped(body):
         return "spam"
+    if mode == "sweep":
+        return decided_skip_reason(record, _load_contract())
     return None
 
 
@@ -148,6 +214,7 @@ def normalize_record(raw: dict[str, Any], kind: str) -> dict[str, Any]:
     merged = bool(raw.get("merged") or raw.get("merged_at") or state == "merged")
     if merged:
         state = "closed"
+    marker = scope_marker()
     return {
         "number": int(raw["number"]),
         "author": login,
@@ -159,6 +226,7 @@ def normalize_record(raw: dict[str, Any], kind: str) -> dict[str, Any]:
         "draft": bool(raw.get("draft") or raw.get("isDraft")),
         "merged": merged,
         "kind": kind,
+        "has_scope_record": resolve_scope_record(raw, marker),
     }
 
 
@@ -179,6 +247,7 @@ def build_batch(
             "author": record["author"],
             "labels": list(record["labels"]),
             "eligible": reason is None,
+            "has_scope_record": record.get("has_scope_record") is True,
         }
         issues.append(item)
         if reason is not None:
@@ -189,6 +258,40 @@ def build_batch(
         "issues": issues,
         "skipped": skipped,
     }
+
+
+def attach_scope_records_for_sweep(
+    records: list[dict[str, Any]],
+    repo: str,
+    repository_labels: list[str],
+    contract: dict[str, Any],
+    runner: Callable[[list[str]], Any] | None = None,
+) -> None:
+    """Fetch issue comments until the sweep batch is full or input ends.
+
+    Labels already on each record skip accepted and declined items. Scope
+    records live in comments, so they are collected here before planning
+    rather than discovered while advising.
+    """
+    call = runner or _gh_json
+    marker = str(contract["processing"]["scope_record_marker"])
+    considered: list[dict[str, Any]] = []
+    for record in records:
+        tentative = dict(record)
+        tentative["has_scope_record"] = False
+        if skip_reason(tentative, "sweep") is not None:
+            record["has_scope_record"] = record.get("has_scope_record") is True
+            considered.append(record)
+            continue
+        path = f"/repos/{repo}/issues/{record['number']}/comments?per_page={PAGE_SIZE}"
+        raw = call(["api", "--paginate", path])
+        if not isinstance(raw, list):
+            raise ValueError("GitHub comments response must be a JSON array")
+        record["has_scope_record"] = comments_have_scope_record(raw, marker)
+        considered.append(record)
+        batch = build_batch(considered, "sweep", repository_labels)
+        if plan_batch(batch, contract)["batch_full"]:
+            break
 
 
 def _trusted_gh() -> str:
@@ -256,9 +359,8 @@ def list_pages(
 ) -> list[dict[str, Any]]:
     """Paginate open issues or pulls oldest-first via `gh api`.
 
-    Sweep passes `processing.read_reviewed` so already-advised items
-    (`triage/recommended`, `status/triaged`) are excluded at GitHub
-    and never downloaded.
+    Sweep passes reviewed and decided labels so already-advised and
+    already-decided items are excluded at GitHub and never downloaded.
     """
     call = runner or _gh_json
     if exclude_labels:
@@ -372,6 +474,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             raise ValueError("Explicit requests require exactly one --number")
         contract = _load_contract()
         records: list[dict[str, Any]]
+        repo = args.repo
         if args.records_json:
             payload = (
                 sys.stdin.read()
@@ -387,7 +490,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             records = [get_one(args.kind, repo, args.numbers[0])]
         else:
             repo = args.repo or _default_repo()
-            exclude = list(contract["processing"]["read_reviewed"]) if args.mode == "sweep" else []
+            exclude = sweep_exclude_labels(contract) if args.mode == "sweep" else []
             records = list_pages(args.kind, repo, exclude_labels=exclude)
         if args.labels_json:
             label_payload = (
@@ -402,7 +505,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif args.records_json:
             repository_labels = [contract["processing"]["active_write_reviewed"]]
         else:
-            repository_labels = list_repo_labels(args.repo or _default_repo())
+            repository_labels = list_repo_labels(repo or _default_repo())
+        if args.mode == "sweep" and not args.records_json:
+            attach_scope_records_for_sweep(
+                records,
+                repo or _default_repo(),
+                repository_labels,
+                contract,
+            )
         batch = accumulate_for_plan(records, args.mode, repository_labels, contract)
         if args.mode != "sweep" and len(batch["issues"]) != 1:
             raise ValueError("Explicit requests require exactly one issue")

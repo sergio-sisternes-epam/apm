@@ -12,9 +12,12 @@ input:
 Activate **autopilot-issue-triage-scheduler**. Targets: **${input:targets}**
 
 1. Named issues = explicit request. `queue-all` = sweep (oldest
-   first, max 10, max two per author) using
+   first, max 5, max two per author) using
    `fetch_queue.py` then `triage_state.py`. Sweep excludes
-   `triage/recommended` and `status/triaged` at fetch.
+   `triage/recommended`, `status/triaged`, `status/accepted`,
+   `status/declined`, and `apm-scope:v1` scope records. Pass
+   labels and `has_scope_record` or comments in one pass before
+   advising. The only run limit is the 30-minute timeout.
 2. Fan out through this run's isolated pool (default 2).
 3. Never share slots with delivery, PR-review, or PR-triage.
 4. Never implement. Never assign.

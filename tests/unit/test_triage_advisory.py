@@ -78,7 +78,7 @@ def test_skipped_first_page_and_author_quota_do_not_starve_later_issues() -> Non
     repeated_author = [_issue(n) for n in range(101, 131)]
     later_authors = [_issue(n, author=f"author-{n}") for n in range(131, 141)]
     result = _plan(first_page + repeated_author + later_authors)
-    assert [item["number"] for item in result["selected"]] == [101, 102, *range(131, 139)]
+    assert [item["number"] for item in result["selected"]] == [101, 102, *range(131, 134)]
     assert result["batch_full"] is True
 
 
@@ -96,12 +96,30 @@ def test_compatibility_needs_no_new_labels_and_never_writes_human_state() -> Non
         "invented",
     ]
     original = deepcopy(issue)
-    result = _plan([issue], labels=["triage/recommended", "type/feature", "area/cli"])
+    result = _plan(
+        [issue],
+        mode="dispatch",
+        labels=["triage/recommended", "type/feature", "area/cli"],
+    )
     assert result["selected"] == [
         {"number": 1, "add_labels": ["area/cli", "triage/recommended"], "remove_labels": []}
     ]
     assert result["implementation_authorized"] is False
     assert issue == original
+
+
+def test_sweep_skips_decided_labels_and_scope_records() -> None:
+    """Sweep selection ignores maintainer decisions even if marked eligible."""
+    accepted = _issue(1, ["status/accepted"])
+    declined = _issue(2, ["status/declined"])
+    scoped = _issue(3)
+    scoped["has_scope_record"] = True
+    fresh = _issue(4)
+    result = _plan([accepted, declined, scoped, fresh])
+    assert [item["number"] for item in result["selected"]] == [4]
+    explicit = _plan([accepted], mode="dispatch")
+    assert explicit["selected"][0]["number"] == 1
+    assert explicit["implementation_authorized"] is False
 
 
 def test_missing_active_marker_fails_before_any_emission() -> None:

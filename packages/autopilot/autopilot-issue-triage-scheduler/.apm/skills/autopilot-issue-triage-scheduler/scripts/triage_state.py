@@ -14,8 +14,11 @@ def plan_batch(data: dict[str, Any], contract: dict[str, Any]) -> dict[str, Any]
     """Select from accumulated oldest-first pages and plan only permitted labels.
 
     Input issues have number, author, labels (names), eligible (the caller's
-    body/state filter), and optional proposed_labels. Explicit requests ignore
-    completed-advice markers, but never eligibility or label-availability checks.
+    body/state filter), optional has_scope_record, and optional proposed_labels.
+    Sweep skips completed-advice markers, status/accepted, status/declined,
+    scope records, and a third issue from the same author. Explicit requests
+    ignore those sweep skips, but never eligibility or label-availability checks.
+    The sweep cap is contract processing.sweep_cap (3 to 5).
     """
     mode = data["mode"]
     if mode not in {"sweep", "label-event", "dispatch"}:
@@ -29,6 +32,10 @@ def plan_batch(data: dict[str, Any], contract: dict[str, Any]) -> dict[str, Any]
         raise ValueError("Explicit requests require exactly one issue")
 
     completed = set(processing["read_reviewed"])
+    decided = {str(name) for name in processing["sweep_exclude_labels"]}
+    sweep_cap = processing["sweep_cap"]
+    if type(sweep_cap) is not int or sweep_cap < 3 or sweep_cap > 5:
+        raise ValueError("Sweep cap must be an integer from 3 to 5")
     allowed = set(contract["classification_labels"]) & repository_labels
     aliases = contract["legacy_read_aliases"]
     selected = []
@@ -43,6 +50,8 @@ def plan_batch(data: dict[str, Any], contract: dict[str, Any]) -> dict[str, Any]
         seen.add(number)
         existing = set(issue["labels"])
         if issue["eligible"] is not True or (mode == "sweep" and existing & completed):
+            continue
+        if mode == "sweep" and (existing & decided or issue.get("has_scope_record") is True):
             continue
         author = issue["author"]
         if mode == "sweep" and per_author.get(author, 0) >= 2:
@@ -66,11 +75,11 @@ def plan_batch(data: dict[str, Any], contract: dict[str, Any]) -> dict[str, Any]
             }
         )
         per_author[author] = per_author.get(author, 0) + 1
-        if len(selected) == 10:
+        if mode == "sweep" and len(selected) == sweep_cap:
             break
     return {
         "selected": selected,
-        "batch_full": len(selected) == 10,
+        "batch_full": mode == "sweep" and len(selected) == sweep_cap,
         "implementation_authorized": False,
     }
 

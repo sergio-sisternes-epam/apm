@@ -95,8 +95,9 @@ Selects issues, including bot-authored issues. Compose
 slot. Trigger: `triage/requested`, a named list, or `queue-all` sweep.
 Does not consume `status/needs-triage`. Helpers:
 `scripts/fetch_queue.py` then `scripts/triage_state.py` (sweep fetch
-excludes `triage/recommended` and `status/triaged`; completed-advice
-skip, two per author, oldest first, cap 10).
+excludes `triage/recommended`, `status/triaged`, `status/accepted`,
+and `status/declined`; completed-advice and scope-record skip, two
+per author, oldest first, cap 5).
 
 ### `autopilot-issue-triage-worker`
 
@@ -124,8 +125,9 @@ actor as a reviewer.
 ### `autopilot-pr-triage-scheduler`
 
 Selects open PRs (named list or `queue-open` sweep), including
-bot-authored PRs. Sweep fetch excludes `triage/recommended` and
-`status/triaged`. Classifies incoming PRs, including those with no
+bot-authored PRs. Sweep fetch excludes `triage/recommended`,
+`status/triaged`, `status/accepted`, and `status/declined` (cap 5).
+Classifies incoming PRs, including those with no
 linked issue. Never merges, never runs review or merge workers.
 
 ### `autopilot-pr-triage-worker`

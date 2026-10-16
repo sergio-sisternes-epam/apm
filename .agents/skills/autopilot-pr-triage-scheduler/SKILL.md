@@ -100,13 +100,18 @@ Modes:
 - `queue-open` / no names: sweep.
 
 `fetch_queue.py` owns list + eligibility (closed, merged, locked,
-empty, template-only; sweep-only draft and spam). Bot-authored
-issues and PRs stay eligible. Sweep list
-excludes `processing.read_reviewed` (`triage/recommended`,
-`status/triaged`) at GitHub so already-advised open PRs are not
-downloaded. Do not comment on skips. `triage_state.py` owns
-completed-advice skip, at most two per author, oldest first,
-cap 10. Explicit requests bypass only spam and completed-advice.
+empty, template-only; sweep-only draft, spam, `status/accepted`,
+`status/declined`, and `apm-scope:v1` scope records). Bot-authored
+issues and PRs stay eligible. Sweep list excludes
+`processing.read_reviewed` (`triage/recommended`, `status/triaged`)
+plus `status/accepted` and `status/declined` at GitHub so
+already-advised and already-decided open PRs are not downloaded.
+Records must carry `labels` and `has_scope_record` or `comments`,
+collected in one pass before advising. Do not comment on skips.
+`triage_state.py` owns completed-advice skip, decided-label and
+scope-record skip, at most two per author, oldest first, cap 5.
+Explicit requests bypass spam, completed-advice, decided labels,
+and scope records.
 
 A missing linked issue is not a skip. Community PRs without an
 issue are in-scope; the worker advises whether an issue should

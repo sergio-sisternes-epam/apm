@@ -98,13 +98,18 @@ Modes (match `.github/workflows/triage-panel.md`):
 - `queue-all` / no names: daily-style sweep.
 
 `fetch_queue.py` owns list + eligibility (closed, locked,
-empty, template-only; sweep-only spam). Bot-authored issues stay
-eligible. Sweep list excludes
+empty, template-only; sweep-only spam, `status/accepted`,
+`status/declined`, and `apm-scope:v1` scope records). Bot-authored
+issues stay eligible. Sweep list excludes
 `processing.read_reviewed` (`triage/recommended`, `status/triaged`)
-at GitHub so already-advised open items are not downloaded. Do not
-comment on skips. `triage_state.py` owns completed-advice skip
-(`processing.read_reviewed`), at most two per author, oldest first,
-cap 10. Explicit requests bypass only spam and completed-advice.
+plus `status/accepted` and `status/declined` at GitHub so
+already-advised and already-decided open items are not downloaded.
+Records must carry `labels` and `has_scope_record` or `comments`,
+collected in one pass before advising. Do not comment on skips.
+`triage_state.py` owns completed-advice skip
+(`processing.read_reviewed`), decided-label and scope-record skip,
+at most two per author, oldest first, cap 5. Explicit requests
+bypass spam, completed-advice, decided labels, and scope records.
 
 Default (authenticated `gh`):
 
