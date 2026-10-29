@@ -267,6 +267,14 @@ class TestFilterFilesByTarget:
         assert ".claude/agents/a.md" in filtered
         assert mappings[".claude/skills/x/SKILL.md"] == ".github/skills/x/SKILL.md"
 
+    def test_cross_map_github_to_foundry(self):
+        from apm_cli.bundle.lockfile_enrichment import _filter_files_by_target
+
+        files = [".github/skills/x/SKILL.md"]
+        filtered, mappings = _filter_files_by_target(files, "foundry")
+        assert ".foundry/skills/x/SKILL.md" in filtered
+        assert mappings[".foundry/skills/x/SKILL.md"] == ".github/skills/x/SKILL.md"
+
     def test_cross_map_github_to_grok_cloud(self):
         from apm_cli.bundle.lockfile_enrichment import _filter_files_by_target
 

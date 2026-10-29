@@ -74,6 +74,7 @@ Reset one flag (when `NAME` is given) or all flags (when omitted) to registry de
 | `registries` | Enables REST-based APM package registries in `apm.yml` and `~/.apm/config.json`. | `apm install` (with `registries:` configured) |
 | `canvas` | Ships Copilot CLI canvas extensions from `.apm/extensions/` bundles. | `apm install` |
 | `external-scanners` | Enables third-party SARIF scanner ingestion in `apm audit` (`--external`, `--external-llm`, `--external-args`), the `external.<name>.{llm,args}` config keys, and `security.audit.scanners` policy governance. | `apm audit --external skillspector` |
+| `foundry` | Deploys skills for the Microsoft Foundry Copilot harness to `.foundry/skills/`. | `apm install --target foundry` |
 | `openclaw` | Deploys skills to OpenClaw runtime directories. | `apm install --target openclaw` |
 
 Run `apm experimental list` to see the live registry; new flags ship in minor releases.

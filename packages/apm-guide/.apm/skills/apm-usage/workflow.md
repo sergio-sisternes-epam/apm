@@ -81,7 +81,7 @@ Kiro use `.opencode/`, `.windsurf/`, and `.kiro/`.
 
 Auto-detection applies only when both manifest fields are omitted. Prefer
 canonical stable names. The legacy singular `target:` field also accepts CLI
-aliases; experimental targets such as `grok-cloud` cannot be stored in
+aliases; experimental targets such as `foundry` and `grok-cloud` cannot be stored in
 `targets:`.
 
 | Input | Result |

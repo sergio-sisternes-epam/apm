@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The explicit-only experimental `foundry` target deploys skills for the Microsoft Foundry Copilot harness to project `.foundry/skills/<skill-name>/SKILL.md` after `apm experimental enable foundry`. It is skills-only and project-scope only; APM does not write `azure.yaml` or call Azure tooling.
+
 ## [0.35.0] - 2026-10-22
 
 ### Added

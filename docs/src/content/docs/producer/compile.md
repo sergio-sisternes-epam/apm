@@ -107,7 +107,7 @@ from `all`. Compile uses the Copilot profile for its file primitives and produce
 rejected before any work runs.
 
 Experimental targets (`openclaw`, `copilot-cowork`,
-`copilot-app`, `grok-cloud`) are deployment targets for `apm install --target <flag>`
+`copilot-app`, `foundry`, `grok-cloud`) are deployment targets for `apm install --target <flag>`
 once enabled via `apm experimental enable <flag>`, and are excluded
 from `--all`. `apm compile` does not emit harness-specific output for
 them. Stable explicit-only Hermes and the other agents-family harnesses read the standard

@@ -173,6 +173,7 @@ class TestTargetProfileUserScope:
             "gemini",
             "grok-build",
             "grok-cloud",
+            "foundry",
             "antigravity",
             "windsurf",
             "kiro",

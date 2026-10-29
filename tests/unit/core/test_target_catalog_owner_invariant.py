@@ -15,6 +15,7 @@ TARGET_NAMES = frozenset(
         "copilot-app",
         "copilot-cowork",
         "cursor",
+        "foundry",
         "gemini",
         "grok-bot",
         "grok-build",

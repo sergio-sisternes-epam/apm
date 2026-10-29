@@ -172,6 +172,7 @@ apm experimental reset verbose-version
 | `verbose-version`     | Show Python version, platform, and install path in `apm --version`.              |
 | `copilot-cowork`      | Deploy APM skills to Microsoft 365 Copilot Cowork via OneDrive.                  |
 | `copilot-app`         | Deploy APM prompts that carry workflow frontmatter (any of `interval`, `schedule_hour`, `schedule_day`) as workflows in the GitHub Copilot desktop App (`~/.copilot/data.db`). See [Copilot App integration](../../integrations/copilot-app/). |
+| `foundry`             | Deploy skills for the Microsoft Foundry Copilot harness (`.foundry/skills/<skill-name>/SKILL.md`). Project scope only. |
 | `grok-cloud`          | Deploy skills to xAI Grok Cloud (`.grok/skills/`). Grok Build is a separate stable target. |
 | `marketplace-authoring`| Enable marketplace authoring commands (init, build, publish, etc.).              |
 | `registries`          | Enable REST-based APM package registries in `apm.yml`.                           |

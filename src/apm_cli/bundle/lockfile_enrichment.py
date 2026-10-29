@@ -38,6 +38,9 @@ _CROSS_TARGET_MAPS: dict[str, dict[str, str]] = {
         ".github/skills/": ".agents/skills/",
         ".github/agents/": ".cursor/agents/",
     },
+    "foundry": {
+        ".github/skills/": ".foundry/skills/",
+    },
     "grok-bot": {
         ".github/skills/": "agent-data/workflows/",
     },

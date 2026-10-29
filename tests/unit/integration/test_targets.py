@@ -335,6 +335,7 @@ class TestDefaultSkillRouting:
             "codex": ".agents",
             "gemini": ".agents",
             "windsurf": ".agents",
+            "foundry": None,
             "grok-build": None,
             "grok-cloud": None,
             "claude": None,  # not documented as .agents/-aware
@@ -432,6 +433,46 @@ class TestDefaultSkillRouting:
         profiles = [KNOWN_TARGETS["copilot"]]
         apply_legacy_skill_paths(profiles)
         assert KNOWN_TARGETS["copilot"].primitives["skills"].deploy_root == original_root
+
+
+class TestFoundryTarget:
+    """Registry and gating invariants for the foundry target."""
+
+    def test_foundry_profile_shape(self):
+        profile = KNOWN_TARGETS["foundry"]
+        assert profile.name == "foundry"
+        assert profile.root_dir == ".foundry"
+        assert profile.user_supported is False
+        assert profile.detect_by_dir is False
+        assert profile.auto_create is True
+        assert profile.requires_flag == "foundry"
+        assert profile.compile_family is None
+        assert profile.capability.explicit_only is True
+        assert set(profile.primitives) == {"skills"}
+        skills_pm = profile.primitives["skills"]
+        assert skills_pm.subdir == "skills"
+        assert skills_pm.extension == "/SKILL.md"
+        assert skills_pm.format_id == "skill_standard"
+        assert skills_pm.deploy_root is None
+
+    def test_foundry_requires_flag_gate(self, monkeypatch, tmp_path):
+        import apm_cli.integration.targets as tg
+
+        monkeypatch.setattr(tg, "_is_flag_enabled", lambda name, **kwargs: False)
+        assert active_targets(tmp_path, explicit_target="foundry") == []
+
+        monkeypatch.setattr(tg, "_is_flag_enabled", lambda name, **kwargs: True)
+        assert [p.name for p in active_targets(tmp_path, explicit_target="foundry")] == ["foundry"]
+
+    def test_foundry_is_excluded_from_all(self, monkeypatch, tmp_path):
+        import apm_cli.integration.targets as tg
+
+        monkeypatch.setattr(tg, "_is_flag_enabled", lambda name, **kwargs: True)
+        names = {p.name for p in active_targets(tmp_path, explicit_target="all")}
+        assert "foundry" not in names
+
+    def test_foundry_has_no_user_scope(self):
+        assert KNOWN_TARGETS["foundry"].user_supported is False
 
 
 class TestGrokCloudTarget:

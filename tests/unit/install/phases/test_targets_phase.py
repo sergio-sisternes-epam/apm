@@ -81,6 +81,23 @@ def _make_ctx(
     return ctx
 
 
+def test_foundry_disabled_flag_emits_enable_hint(
+    tmp_path: Path,
+    inject_config: Any,
+) -> None:
+    from apm_cli.install.phases.targets import _check_foundry_flag_gate
+
+    inject_config({"experimental": {"foundry": False}})
+    ctx = _make_ctx(tmp_path, target_override="foundry")
+
+    _check_foundry_flag_gate("foundry", [], ctx)
+
+    ctx.logger.progress.assert_called_once_with(
+        "The 'foundry' target requires an experimental flag. Run: apm experimental enable foundry",
+        symbol="info",
+    )
+
+
 def test_grok_cloud_disabled_flag_emits_enable_hint(
     tmp_path: Path,
     inject_config: Any,

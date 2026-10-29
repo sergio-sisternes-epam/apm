@@ -1062,7 +1062,7 @@ class TestCoworkParserLayer:
         requires an intentional test update.
         """
         assert (
-            frozenset({"copilot-cowork", "copilot-app", "grok-cloud", "openclaw"})
+            frozenset({"copilot-cowork", "copilot-app", "foundry", "grok-cloud", "openclaw"})
             == EXPERIMENTAL_TARGETS
         )
 

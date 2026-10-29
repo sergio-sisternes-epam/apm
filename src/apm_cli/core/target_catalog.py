@@ -167,6 +167,13 @@ TARGET_CAPABILITIES: Mapping[str, TargetCapability] = _build_target_catalog(
             compile_family="agents",
         ),
         _capability(
+            "foundry",
+            "Microsoft Foundry Copilot harness native .foundry/skills configuration",
+            explicit_only=True,
+            experimental_flag="foundry",
+            primitive_profile="foundry",
+        ),
+        _capability(
             "gemini",
             "Gemini CLI native .gemini configuration",
             in_all=True,

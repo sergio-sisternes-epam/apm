@@ -878,6 +878,19 @@ KNOWN_TARGETS: dict[str, TargetProfile] = {
         user_supported=True,
         user_root_dir=".grok",
     ),
+    # Microsoft Foundry Copilot harness -- project-only skills folders at
+    # ``.foundry/skills/<skill-name>/SKILL.md``.  Skills are the only
+    # deployed primitive; there is no user scope.
+    "foundry": TargetProfile(
+        capability=TARGET_CAPABILITIES["foundry"],
+        root_dir=".foundry",
+        primitives={
+            "skills": PrimitiveMapping("skills", "/SKILL.md", "skill_standard"),
+        },
+        auto_create=True,
+        detect_by_dir=False,
+        user_supported=False,
+    ),
     # Grok Cloud -- xAI docs verify project ``./.grok/skills/`` and user
     # ``~/.grok/skills/``.  Skills are the only deployed primitive.
     "grok-cloud": TargetProfile(

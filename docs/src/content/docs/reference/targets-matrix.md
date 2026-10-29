@@ -44,7 +44,7 @@ instructions, prompts, agents, and hooks use `.github/`, while skills use
 `.agents/skills/`. The IntelliJ-specific adapter configures MCP only.
 
 `copilot-cowork` (Microsoft 365 Copilot), `copilot-app` (GitHub Copilot
-desktop App), `grok-cloud` (xAI Grok Cloud), and `openclaw` (OpenClaw agent
+desktop App), `foundry` (Microsoft Foundry Copilot harness), `grok-cloud` (xAI Grok Cloud), and `openclaw` (OpenClaw agent
 runtime) are gated behind experimental flags and not listed above. Hermes is
 stable but explicit-only. See [Experimental](../experimental/).
 
@@ -103,7 +103,7 @@ targets: never auto-detected and excluded from `all`. Select them with
 `--target` or list them in a project's `apm.yml` `targets:` field so
 contributors running plain `apm install` pick them up automatically.
 
-`copilot-cowork`, `copilot-app`, `grok-cloud`, and `openclaw` are
+`copilot-cowork`, `copilot-app`, `foundry`, `grok-cloud`, and `openclaw` are
 experimental targets that require `apm experimental enable <name>` before use.
 They are selected with `--target` only and cannot be listed in `apm.yml` (the
 canonical targets validator will reject them).
@@ -369,6 +369,36 @@ Grok Bot agent skills deployment.
   `.grok/skills/<name>/SKILL.md`.
 - **Compile behavior.** Produces `AGENTS.md`.
 
+## foundry (experimental)
+
+> [!WARNING]
+> Preview. Experimental and subject to change.
+
+Microsoft Foundry Copilot harness skills deployment.
+
+- **Detection.** Never auto-detected. After enabling the experimental flag,
+  selecting `--target foundry` creates the deploy directory when needed.
+- **Enable.** `apm experimental enable foundry`.
+- **Deploy directory.** `.foundry/` at project scope. No user scope:
+  `--global` is not supported.
+- **Supported primitives.** skills only.
+- **File conventions.** `.foundry/skills/<skill-name>/SKILL.md`, one folder
+  per skill.
+- **Compile behavior.** `apm compile --target foundry` is a successful no-op.
+- **Out of scope.** APM does not write `azure.yaml`, run `azd` or `az`, call
+  any network API, or handle credentials. It also does not emit MCP,
+  instructions, agents, prompts, hooks, or commands for this target.
+
+Point an `azure.ai.skill` service in your own `azure.yaml` at a skill folder:
+
+```yaml
+services:
+  my-skill:
+    host: azure.ai.skill
+    project: .
+    archive: ./.foundry/skills/my-skill
+```
+
 ## grok-cloud (experimental)
 
 xAI Grok Cloud skills deployment.
@@ -402,7 +432,7 @@ xAI Grok Cloud skills deployment.
 
 Most targets with a `skills` primitive deploy to
 `.agents/skills/<name>/SKILL.md`. Claude, Grok Build, Kiro, and experimental
-Grok Cloud keep target-native skill directories.
+Grok Cloud, and Foundry keep target-native skill directories.
 
 To restore the pre-convergence per-target layout (skills land under each target's own root), use the `--legacy-skill-paths` flag on `apm install` or set `APM_LEGACY_SKILL_PATHS=1`.
 
