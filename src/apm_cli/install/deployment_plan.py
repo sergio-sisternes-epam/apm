@@ -55,6 +55,7 @@ def prepare_package_deployment(  # noqa: PLR0913
     trust_bin: bool | None = None,
     bin_skip_reason_override: str | None = None,
     read_only: bool = False,
+    is_dev_dependency: bool = False,
 ) -> PackageDeploymentPlan:
     """Resolve deployment authorization without writing native target content."""
     import sys
@@ -63,7 +64,12 @@ def prepare_package_deployment(  # noqa: PLR0913
     from apm_cli.install.deployable_source_plan import DeployableSourcePlan
 
     selection = resolve_effective_package_targets(
-        targets, dep_target_subset, package_info, diagnostics, package_name
+        targets,
+        dep_target_subset,
+        package_info,
+        diagnostics,
+        package_name,
+        is_dev_dependency=is_dev_dependency,
     )
     log_package_target_restriction(logger, selection)
     if not selection.targets:

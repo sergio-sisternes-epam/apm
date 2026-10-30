@@ -84,10 +84,14 @@ FLAGS: dict[str, ExperimentalFlag] = {
     ),
     "foundry": ExperimentalFlag(
         name="foundry",
-        description="Deploy skills for the Microsoft Foundry Copilot harness.",
+        description=(
+            "Deploy skills and prompt agents for the Microsoft Foundry Copilot harness "
+            "(.foundry/skills/ and azure.yaml services)."
+        ),
         default=False,
         hint=(
-            "Use '--target foundry' to deploy skills to '.foundry/skills/<skill-name>/SKILL.md'."
+            "Use '--target foundry' to deploy skills to '.foundry/skills/<skill-name>/SKILL.md' "
+            "and agents with 'foundry:' frontmatter to azure.yaml."
         ),
     ),
     "grok_cloud": ExperimentalFlag(

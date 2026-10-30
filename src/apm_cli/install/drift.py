@@ -689,6 +689,7 @@ def run_replay(config: ReplayConfig, logger: CheckLogger) -> Path:
                             # Honor per-dependency 'targets:' narrowing from apm.yml so the
                             # replay does not write to targets excluded by the consumer (#1923).
                             dep_target_subset=lock_dep.target_subset or None,
+                            is_dev_dependency=bool(lock_dep.is_dev),
                         )
                     except AgentPluginTargetExcludedError:
                         continue

@@ -1,5 +1,6 @@
 """Regression tests for CLI help and output consistency."""
 
+import re
 from unittest.mock import patch
 
 import click
@@ -7,6 +8,15 @@ from click.testing import CliRunner
 
 from apm_cli.cli import cli
 from apm_cli.output.script_formatters import ScriptExecutionFormatter
+
+
+def _normalize_help(text: str) -> str:
+    """Undo Click help wrapping: rejoin hyphen-split words, collapse whitespace.
+
+    Click may wrap on hyphens (e.g. ``grok-`` / newline / indent / ``build``),
+    so substring assertions must run against the unwrapped text.
+    """
+    return " ".join(re.sub(r"-\n\s+", "-", text).split())
 
 
 def _walk_commands(group: click.Group, prefix: tuple[str, ...] = ()):
@@ -182,7 +192,7 @@ def test_deps_update_target_help_uses_current_catalog():
     result = CliRunner().invoke(cli, ["deps", "update", "--help"])
 
     assert result.exit_code == 0
-    help_text = result.output
+    help_text = _normalize_help(result.output)
     # Targets absent from the old hardcoded string
     assert "grok-build" in help_text
     assert "agents" in help_text
@@ -259,7 +269,7 @@ def test_deps_update_target_help_values_catalog_sorted():
     """
     result = CliRunner().invoke(cli, ["deps", "update", "--help"])
     assert result.exit_code == 0
-    normalized = " ".join(result.output.split())
+    normalized = _normalize_help(result.output)
 
     # Locate the Values: ... fragment in the help text and check ordering within it
     values_start = normalized.find("Values:")

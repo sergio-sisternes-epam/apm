@@ -104,6 +104,8 @@ def resolve_effective_package_targets(
     package_source: object,
     diagnostics: DiagnosticCollector | None,
     package_name: str,
+    *,
+    is_dev_dependency: bool = False,
 ) -> EffectivePackageTargets:
     """Intersect active, consumer-authorized, and package-declared targets.
 
@@ -111,6 +113,8 @@ def resolve_effective_package_targets(
     targets may narrow that set, and package targets may narrow it again.
     Package metadata never activates a target absent from either upstream set.
     An omitted declaration and the legacy ``all`` spelling add no restriction.
+    A package reached only through ``devDependencies`` never reaches a target
+    whose capability sets ``production_dependencies_only``.
 
     A declaration that leaves nothing to deploy to only warns here; whether an
     explicit ``--target`` request must fail is decided once per install by
@@ -133,6 +137,12 @@ def resolve_effective_package_targets(
             package_name,
         )
         consumer_targets = tuple(filtered)
+    if is_dev_dependency:
+        consumer_targets = tuple(
+            target
+            for target in consumer_targets
+            if not target.capability.production_dependencies_only
+        )
 
     package = getattr(package_source, "package", package_source)
     try:
@@ -211,6 +221,7 @@ def explicit_target_failure(
             package,
             None,
             "",
+            is_dev_dependency=bool(getattr(node, "is_dev", False)),
         )
         deployable = bool(selection.targets) or not selection.package_restriction_active
         return list(selection.package_declared_targets), deployable

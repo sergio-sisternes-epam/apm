@@ -219,6 +219,7 @@ def integrate_package_primitives(  # noqa: PLR0913
     trust_bin: bool | None = None,
     bin_skip_reason_override: str | None = None,
     deployment_plan: PackageDeploymentPlan | None = None,
+    is_dev_dependency: bool = False,
 ) -> dict:
     """Run the full integration pipeline for a single package.
 
@@ -302,6 +303,7 @@ def integrate_package_primitives(  # noqa: PLR0913
         trust_bin=trust_bin,
         bin_skip_reason_override=bin_skip_reason_override,
         read_only=scratch_root is not None,
+        is_dev_dependency=is_dev_dependency,
     )
     target_selection = deployment_plan.target_selection
     targets = list(target_selection.targets)

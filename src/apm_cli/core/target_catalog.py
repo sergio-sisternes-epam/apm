@@ -24,6 +24,9 @@ class TargetCapability:
     commands: frozenset[str]
     meta_target: bool = False
     accepts_agent_skills_packages: bool = False
+    # Never deploy devDependencies content (only manifest ``dependencies``
+    # and local primitives reach this target).
+    production_dependencies_only: bool = False
 
 
 _TARGET_COMMANDS = frozenset({"compile", "install", "update"})
@@ -43,6 +46,7 @@ def _capability(
     runtimes: tuple[str, ...] = (),
     meta_target: bool = False,
     accepts_agent_skills_packages: bool = False,
+    production_dependencies_only: bool = False,
 ) -> TargetCapability:
     """Create catalog data shared by all target-selecting commands."""
     return TargetCapability(
@@ -59,6 +63,7 @@ def _capability(
         commands=_TARGET_COMMANDS,
         meta_target=meta_target,
         accepts_agent_skills_packages=accepts_agent_skills_packages,
+        production_dependencies_only=production_dependencies_only,
     )
 
 
@@ -168,10 +173,11 @@ TARGET_CAPABILITIES: Mapping[str, TargetCapability] = _build_target_catalog(
         ),
         _capability(
             "foundry",
-            "Microsoft Foundry Copilot harness native .foundry/skills configuration",
+            "Microsoft Foundry Copilot harness native .foundry skills and azure.yaml agents",
             explicit_only=True,
             experimental_flag="foundry",
             primitive_profile="foundry",
+            production_dependencies_only=True,
         ),
         _capability(
             "gemini",

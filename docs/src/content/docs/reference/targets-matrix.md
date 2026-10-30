@@ -374,30 +374,136 @@ Grok Bot agent skills deployment.
 > [!WARNING]
 > Preview. Experimental and subject to change.
 
-Microsoft Foundry Copilot harness skills deployment.
+Microsoft Foundry Copilot harness skills and prompt-agent deployment.
 
 - **Detection.** Never auto-detected. After enabling the experimental flag,
   selecting `--target foundry` creates the deploy directory when needed.
 - **Enable.** `apm experimental enable foundry`.
-- **Deploy directory.** `.foundry/` at project scope. No user scope:
-  `--global` is not supported.
-- **Supported primitives.** skills only.
+- **Deploy directory.** `.foundry/` at project scope, plus service entries in
+  the project-root `azure.yaml`. No user scope: `--global` is not supported.
+- **Supported primitives.** skills, and agents that carry a `foundry:`
+  frontmatter mapping.
 - **File conventions.** `.foundry/skills/<skill-name>/SKILL.md`, one folder
-  per skill.
+  per skill. Agents become inline `azure.yaml` services; no
+  `.foundry/agents/` directory is written.
 - **Compile behavior.** `apm compile --target foundry` is a successful no-op.
-- **Out of scope.** APM does not write `azure.yaml`, run `azd` or `az`, call
-  any network API, or handle credentials. It also does not emit MCP,
-  instructions, agents, prompts, hooks, or commands for this target.
+- **devDependencies.** Never deployed to foundry. Only local primitives and
+  `dependencies` packages (and their production transitive deps) reach
+  `.foundry/` and `azure.yaml`.
+- **Out of scope.** APM does not run `azd` or `az`, call any network API, or
+  handle credentials. It does not emit instructions, prompts, hooks, or
+  commands for this target.
 
-Point an `azure.ai.skill` service in your own `azure.yaml` at a skill folder:
+### Foundry agents
+
+An `.apm/agents/<name>.agent.md` file is a Foundry agent only when it has a
+top-level `foundry:` mapping; other agents are skipped (other targets ignore
+`foundry:`). The body becomes the agent instructions.
+
+```markdown
+---
+name: support-assistant
+description: Answers support questions
+foundry:
+  model: ${AZURE_AI_MODEL_DEPLOYMENT=small}
+  skills: [kb-lookup]
+  builtin_tools:
+    enabled: [filesystem_read, subagents]
+  mcp:
+    - connection: my-search-connection
+      server_label: search
+      server_url: https://search.example.com/mcp/
+      allowed_tools: [search_documents]
+---
+You are a support assistant. Use the kb-lookup skill to answer questions.
+```
+
+| Field | Type | Required | Default | Emitted as |
+|---|---|---|---|---|
+| `name` | string | no | file stem | service key; must match `^[a-z0-9][a-z0-9-]{0,62}$` |
+| `description` | string | no | - | not emitted |
+| body | markdown | yes (non-empty) | - | `instructions` (literal block, trailing whitespace stripped) |
+| `foundry.model` | deployment name or `${VAR}` / `${VAR=default}` | yes | - | `model` |
+| `foundry.kind` | `prompt` | no | `prompt` | `kind` |
+| `foundry.harness` | `microsoft_copilot_preview` | no | `microsoft_copilot_preview` | `harness.type` |
+| `foundry.skills` | list of skill names | no | `[]` | `skills` + `uses` + one `azure.ai.skill` service per skill |
+| `foundry.builtin_tools.default_enabled` | bool | no | `false` | `tools[0].defaultConfig.enabled` |
+| `foundry.builtin_tools.enabled` | list of `filesystem_read`, `filesystem_write`, `shell`, `subagents`, `web` | no | `[]` | `configs[]` with `enabled: true` |
+| `foundry.builtin_tools.disabled` | same names | no | `[]` | `configs[]` with `enabled: false` |
+| `foundry.mcp[].connection` | Foundry project connection name (or `${VAR}`) | yes | - | `project_connection_id` |
+| `foundry.mcp[].server_label` | `^[a-zA-Z0-9_-]+$`, unique per agent | yes | - | `server_label` |
+| `foundry.mcp[].server_url` | `https://` URL | yes | - | `server_url` |
+| `foundry.mcp[].require_approval` | `always` or `never` | no | `always` | `require_approval` |
+| `foundry.mcp[].allowed_tools` | list of tool names | no | omitted | `allowed_tools` |
+
+Validation errors name the agent file and fail the install:
+
+- Unknown keys under `foundry`, `builtin_tools`, or an `mcp` entry.
+- Credential-like keys (`token`, `api_key`, `apikey`, `key`, `secret`,
+  `password`, `headers`, `authorization`). Credentials belong in the Foundry
+  project connection; reference it by name with `connection`.
+- A tool listed in both `enabled` and `disabled`.
+- A skill in `foundry.skills` that this install did not deploy to
+  `.foundry/skills/`. Skills from devDependencies never count.
+
+The example above emits:
 
 ```yaml
 services:
-  my-skill:
+  kb-lookup:
     host: azure.ai.skill
-    project: .
-    archive: ./.foundry/skills/my-skill
+    archive: ./.foundry/skills/kb-lookup
+  support-assistant:
+    host: azure.ai.agent
+    project: .foundry
+    kind: prompt
+    harness:
+      type: microsoft_copilot_preview
+    model: ${AZURE_AI_MODEL_DEPLOYMENT=small}
+    instructions: |
+      You are a support assistant. Use the kb-lookup skill to answer questions.
+    skills:
+      - kb-lookup
+    uses:
+      - kb-lookup
+    tools:
+      - type: microsoft_copilot_toolset_preview
+        defaultConfig:
+          enabled: false
+        configs:
+          - name: filesystem_read
+            enabled: true
+          - name: subagents
+            enabled: true
+      - type: mcp
+        server_label: search
+        server_url: https://search.example.com/mcp/
+        project_connection_id: my-search-connection
+        require_approval: always
+        allowed_tools:
+          - search_documents
 ```
+
+**Why inline, not `$ref`.** azd's `azure.ai.agent` host looks for a prompt
+agent's `skills/` folder next to a `$ref`-ed definition file. A
+`$ref: .foundry/agents/<name>/agent.yaml` would look in
+`.foundry/agents/<name>/skills/` instead of the shared `.foundry/skills/`.
+The inline entry with `project: .foundry` resolves the shared skill folders.
+
+### azure.yaml ownership
+
+- APM records the services it manages in `.foundry/apm-services.json`. Each
+  `apm install --target foundry` updates those entries in place, appends new
+  ones in name order, and removes managed entries that are no longer
+  produced.
+- Your other services, top-level keys, and comments are preserved. If an APM
+  service name matches a service you wrote, install fails; rename or delete
+  your entry.
+- With no Foundry agents, APM does not create or touch `azure.yaml`.
+- Output is deterministic: a second install leaves `azure.yaml` and
+  `.foundry/` byte-identical.
+- `azure.yaml` is never recorded as an APM-deployed file, so `apm uninstall`
+  never deletes it. Re-run `apm install --target foundry` to refresh it.
 
 ## grok-cloud (experimental)
 

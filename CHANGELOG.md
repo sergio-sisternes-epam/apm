@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- The explicit-only experimental `foundry` target deploys skills for the Microsoft Foundry Copilot harness to project `.foundry/skills/<skill-name>/SKILL.md` after `apm experimental enable foundry`. It is skills-only and project-scope only; APM does not write `azure.yaml` or call Azure tooling.
+- The explicit-only experimental `foundry` target deploys skills for the Microsoft Foundry Copilot harness to project `.foundry/skills/<skill-name>/SKILL.md` after `apm experimental enable foundry`. Agent primitives with a `foundry:` frontmatter mapping (local and `dependencies` packages, never `devDependencies`) become inline `azure.ai.agent` prompt-agent services, plus `azure.ai.skill` services for the skills they use, in the project-root `azure.yaml`; user-authored services and comments are preserved. Project scope only; APM does not run `azd`/`az` or call any network API.
 
 ## [0.35.0] - 2026-10-22
 

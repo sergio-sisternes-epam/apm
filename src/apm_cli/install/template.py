@@ -82,6 +82,14 @@ def _effective_allow(ctx) -> dict | None:
     return allow_map
 
 
+def _is_dev_dependency(ctx: InstallContext, dep_key: str) -> bool:
+    """Return whether *dep_key* is reached only through devDependencies."""
+    graph = getattr(ctx, "dependency_graph", None)
+    tree = getattr(graph, "dependency_tree", None)
+    node = tree.get_node(dep_key) if tree is not None else None
+    return bool(getattr(node, "is_dev", False))
+
+
 def run_integration_template(
     source: DependencySource,
     *,
@@ -198,6 +206,7 @@ def preflight_skill_materializations(
             ctx=ctx,
             allow_executables=_effective_allow(ctx),
             trust_bin=ctx.trust_bin,
+            is_dev_dependency=_is_dev_dependency(ctx, materialization.dep_key),
         )
         plans[materialization.dep_key] = plan
         check(materialization.package_info, plan)
@@ -523,6 +532,7 @@ def _integrate_materialization(
             allow_executables=_effective_allow(ctx),
             trust_bin=getattr(ctx, "trust_bin", None),
             deployment_plan=deployment_plan,
+            is_dev_dependency=_is_dev_dependency(ctx, dep_key),
         )
         mutation_keys = (
             "prompts",

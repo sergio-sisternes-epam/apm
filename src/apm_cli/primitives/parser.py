@@ -139,6 +139,8 @@ def _parse_chatmode(
         source=source,
         handoffs=handoffs,
         user_invocable=resolve_user_invocable(metadata),
+        declared_name=metadata.get("name") if isinstance(metadata.get("name"), str) else None,
+        foundry=metadata.get("foundry") if "foundry" in metadata else None,
     )
 
 

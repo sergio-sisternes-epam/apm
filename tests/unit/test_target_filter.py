@@ -241,3 +241,18 @@ def test_conflicting_dependency_target_keys_fail_before_authorization() -> None:
             DiagnosticCollector(),
             "owner/conflicting-hooks",
         )
+
+
+def test_dev_dependency_never_reaches_production_only_targets() -> None:
+    """devDependencies skip production-only targets (foundry) but keep the rest."""
+    targets = [KNOWN_TARGETS["claude"], KNOWN_TARGETS["foundry"]]
+    package = SimpleNamespace(package=None)
+
+    dev = resolve_effective_package_targets(
+        targets, None, package, None, "dev", is_dev_dependency=True
+    )
+    prod = resolve_effective_package_targets(targets, None, package, None, "prod")
+
+    assert [target.name for target in dev.targets] == ["claude"]
+    assert [target.name for target in dev.excluded_targets] == ["foundry"]
+    assert [target.name for target in prod.targets] == ["claude", "foundry"]

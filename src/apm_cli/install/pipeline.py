@@ -803,6 +803,13 @@ def run_install_pipeline(  # noqa: C901, PLR0913, PLR0915, RUF100
                 "One or more direct dependencies failed validation. Run with --verbose for details."
             )
 
+        # Experimental foundry target: emit agent services into azure.yaml
+        # once every skill this install deploys is in place.
+        if not lockfile_only:
+            from .phases import foundry_agents as _foundry_agents_phase
+
+            _run_phase("foundry_agents", _foundry_agents_phase, ctx)
+
         from .outcome import result_from_install_context
 
         precommit_result = result_from_install_context(ctx)

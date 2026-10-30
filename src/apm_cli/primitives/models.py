@@ -50,6 +50,10 @@ class Chatmode:
     # Programmatic-only agents (user_invocable=False) are reachable only via another
     # agent's handoffs block and are excluded from the user-facing agent picker.
     user_invocable: bool = True
+    # Frontmatter ``name`` as authored (``name`` above is the file stem).
+    declared_name: str | None = None
+    # Raw ``foundry:`` frontmatter mapping; only the foundry target reads it.
+    foundry: dict | None = None
 
     def validate(self) -> list[str]:
         """Validate chatmode structure.
